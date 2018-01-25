@@ -1,6 +1,10 @@
 
 
 $('#fpTrackingParallelForm').submit(() => {
+
+	//clear the display
+	$('#fpTrackingParallelResultsErrorAlertId').hide();
+	
 	//verify parameters
 	let number = parseInt($('#fpTrackingParallelNumberId').val());
 	let minNbPerUser = parseInt($('#fpTrackingParallelMinNbPerUserId').val());
@@ -18,7 +22,8 @@ $('#fpTrackingParallelForm').submit(() => {
 				//alert(data); 
 			},
 			error: (e) => {
-				alert('La requête n\'a pas abouti : ');
+				$('#fpTrackingParallelResultsErrorAlertId').show();
+				$('#fpTrackingParallelResultsErrorAlertId').html('The server wasn\'t able to process the request');
 			}
 		});
 	}

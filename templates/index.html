@@ -4,35 +4,75 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>fpTracking</title>
+		<link href="/static/css/bootstrap.min.css" rel="stylesheet">
 	</head>
 	<body>
-		<h1>fpTracking</h1>
+		<h1 align="center">The Fingerprint Tracking algorithms</h1>
 		<br>
 
-		<form id="fpTrackingParallelForm">
-			Number of fingerprints : <input type="text" name="fpTrackingParallelNumber" id="fpTrackingParallelNumberId" placeholder="Number"><br>
-			Minimum number of fingerprints per user : <input type="text" name="fpTrackingParallelMinNbPerUser" id="fpTrackingParallelMinNbPerUserId" placeholder="nbMinPerUser"><br>
-			Visit frequency : <br>
-			1 : <input type="checkbox" name="fpTrackingParallelVisitFrequency" value="1">
-			2 : <input type="checkbox" name="fpTrackingParallelVisitFrequency" value="2">
-			3 : <input type="checkbox" name="fpTrackingParallelVisitFrequency" value="3"><br>
-			4 : <input type="checkbox" name="fpTrackingParallelVisitFrequency" value="4">
-			5 : <input type="checkbox" name="fpTrackingParallelVisitFrequency" value="5">
-			6 : <input type="checkbox" name="fpTrackingParallelVisitFrequency" value="6"><br>
-			7 : <input type="checkbox" name="fpTrackingParallelVisitFrequency" value="7">
-			8 : <input type="checkbox" name="fpTrackingParallelVisitFrequency" value="8">
-			9 : <input type="checkbox" name="fpTrackingParallelVisitFrequency" value="9"><br>
-			10 : <input type="checkbox" name="fpTrackingParallelVisitFrequency" value="10">
-			15 : <input type="checkbox" name="fpTrackingParallelVisitFrequency" value="15">
-			20 : <input type="checkbox" name="fpTrackingParallelVisitFrequency" value="20"><br>
-			<input type="submit" value="Launch the tracking program">
-		</form>
+		<div class="container" align="center">
+			<form id="fpTrackingParallelForm">
+				<table>
+					<tr>
+						<td>Number of fingerprints :</td>
+						<td><input type="text" name="fpTrackingParallelNumber" id="fpTrackingParallelNumberId" placeholder="Number"></td>
+					</tr>
+					<tr>
+						<td>Minimum number of fingerprints per user :</td>
+						<td><input type="text" name="fpTrackingParallelMinNbPerUser" id="fpTrackingParallelMinNbPerUserId" placeholder="minNbPerUser"></td>
+					</tr>
+					<tr>
+						<td>Visit frequency :</td>
+						<td>
+							<table>
+								<tr>
+									<td>1 : </td>
+									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="1"></td>
+									<td>2 : </td>
+									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="2"></td>
+									<td>3 : </td>
+									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="3"></td>
+								</tr>
+								<tr>
+									<td>4 : </td>
+									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="4"></td>
+									<td>5 : </td>
+									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="5"></td>
+									<td>6 : </td>
+									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="6"></td>
+								</tr>
+								<tr>
+									<td>7 : </td>
+									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="7"></td>
+									<td>8 : </td>
+									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="8"></td>
+									<td>9 : </td>
+									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="9"></td>
+								</tr>
+								<tr>
+									<td>10 : </td>
+									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="10"></td>
+									<td>15 : </td>
+									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="15"></td>
+									<td>20 : </td>
+									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="20"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td><input type="submit" class="btn btn-primary" value="Launch the tracking program"></td>
+					</tr>
+				</table>
+			</form>
 
-		<div id="fpTrackingParallelResultsId">
-			
+			<div id="fpTrackingParallelResultsId">
+				<div class="alert alert-warning" role="alert" id="fpTrackingParallelResultsErrorAlertId" style="display: none;"></div>
+			</div>
 		</div>
 
-		<script src="/static/js/jquery-3.3.1.js"></script>
+		<script src="/static/js/jquery-3.3.1.min.js"></script>
+		<script src="/static/js/bootstrap.min.js"></script>
 		<script src="/static/js/fpTracking-script.js"></script>
 	</body>
 </html>
