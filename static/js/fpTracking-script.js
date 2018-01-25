@@ -1,8 +1,12 @@
 
 
 $('#fpTrackingParallelForm').submit(() => {
+	//verify parameters 
+	//useful ?
+	
+	//send the request
 	$.ajax({
-		url: 'testPost/',
+		url: 'tracking_parallel/',
 		type: 'POST',
 		data: $('#fpTrackingParallelForm').serialize(),
 		success: (data) => {

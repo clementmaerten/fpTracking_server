@@ -12,10 +12,10 @@ import (
 	"os"
 	"strconv"
 	"os/signal"
-	"encoding/json"
+	//"encoding/json"
 	"path"
 	"html/template"
-	"github.com/clementmaerten/fpTracking"
+	//"github.com/clementmaerten/fpTracking"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -84,25 +84,45 @@ func testPostHandler(w http.ResponseWriter, r *http.Request) {
 	//fmt.Println(r.FormValue("name"))
 	for key, value := range r.Form {
 		fmt.Println(key,value)
+		//fmt.Println(key,":",r.FormValue(key))
 	}
 }
 
 func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 
-	log.Println("trackingParallelHandler launched")
 
-	number, err1 := strconv.Atoi("5000")
-	train, err2 := strconv.ParseFloat("0.01",64)
+	//Parse the parameters in a map
+	r.ParseForm()
+
+	number, err1 := strconv.Atoi(r.FormValue("fpTrackingParallelNumber"))
+	minNbPerUser, err2 := strconv.Atoi(r.FormValue("fpTrackingParallelMinNbPerUser"))
+	//train := float64(0)
 	if (err1 != nil || err2 != nil) {
-		fmt.Println("The format is not respected !")
+		log.Println("Error in the format in trackingParallelHandler")
 		http.Error(w, err1.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	fingerprintManager := fpTracking.FingerprintManager{
+	//conversion of string slice visitFrequencies to int slice
+	var visitFrequencies []int
+	for _, stringValue := range r.Form["fpTrackingParallelVisitFrequency"] {
+		intValue, err := strconv.Atoi(stringValue)
+		if err != nil {
+			log.Println("Error in the format in trackingParallelHandler")
+			http.Error(w, err1.Error(), http.StatusInternalServerError)
+			return
+		}
+		visitFrequencies = append(visitFrequencies,intValue)
+	}
+
+
+	log.Println("trackingParallelHandler launched with number =",number,
+		", minNbPerUser =",minNbPerUser,", visitFrequencies =",visitFrequencies)
+
+	/*fingerprintManager := fpTracking.FingerprintManager{
 		Number: number,
 		Train:  train,
-		MinNumberFpPerUser: 6,
+		MinNumberFpPerUser: minNbPerUser,
 		DBInfo: fpTracking.DBInformation {
 			DBType: "mysql",
 			User: "root",
@@ -115,7 +135,7 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Start fetching fingerprints\n")
 	_, test := fingerprintManager.GetFingerprints()
 	fmt.Printf("Fetched %d fingerprints\n", len(test))
-	visitFrequencies := []int{1, 2, 3, 4, 5, 6, 7, 8, 10, 15, 20}
+
 	var jsonResults []fpTracking.ResultsForVisitFrequency
 
 	for _, visitFrequency := range visitFrequencies {
@@ -133,5 +153,5 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 
 	//w.Header().Set("Server","A Fingerprint tracking Go WebServer")
 	w.Header().Set("Content-Type","application/json; charset=utf-8")
-	w.Write(js)
+	w.Write(js)*/
 }
