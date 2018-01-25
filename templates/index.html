@@ -10,9 +10,8 @@
 		<br>
 
 		<form id="fpTrackingParallelForm">
-			Number of fingerprints : <input type="text" name="fpTrackingParallelNumber" placeholder="Number"><br>
-			Minimum number of fingerprints per user : 
-			<input type="text" name="fpTrackingParallelMinNbPerUser" placeholder="nbMinPerUser"><br>
+			Number of fingerprints : <input type="text" name="fpTrackingParallelNumber" id="fpTrackingParallelNumberId" placeholder="Number"><br>
+			Minimum number of fingerprints per user : <input type="text" name="fpTrackingParallelMinNbPerUser" id="fpTrackingParallelMinNbPerUserId" placeholder="nbMinPerUser"><br>
 			Visit frequency : <br>
 			1 : <input type="checkbox" name="fpTrackingParallelVisitFrequency" value="1">
 			2 : <input type="checkbox" name="fpTrackingParallelVisitFrequency" value="2">
@@ -29,7 +28,9 @@
 			<input type="submit" value="Launch the tracking program">
 		</form>
 
-		<span id="testSpanId"></span>
+		<div id="fpTrackingParallelResultsId">
+			
+		</div>
 
 		<script src="/static/js/jquery-3.3.1.js"></script>
 		<script src="/static/js/fpTracking-script.js"></script>

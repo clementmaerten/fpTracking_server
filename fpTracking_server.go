@@ -97,9 +97,15 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 	number, err1 := strconv.Atoi(r.FormValue("fpTrackingParallelNumber"))
 	minNbPerUser, err2 := strconv.Atoi(r.FormValue("fpTrackingParallelMinNbPerUser"))
 	//train := float64(0)
-	if (err1 != nil || err2 != nil) {
+	if err1 != nil || err2 != nil || number <= 0 || minNbPerUser <= 0 {
 		log.Println("Error in the format in trackingParallelHandler")
-		http.Error(w, err1.Error(), http.StatusInternalServerError)
+		if err1 != nil {
+			http.Error(w, err1.Error(), http.StatusBadRequest)
+		} else if err2 != nil {
+			http.Error(w, err2.Error(), http.StatusBadRequest)
+		} else {
+			http.Error(w, "Nul or negative parameters", http.StatusBadRequest)
+		}
 		return
 	}
 
@@ -108,11 +114,16 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 	for _, stringValue := range r.Form["fpTrackingParallelVisitFrequency"] {
 		intValue, err := strconv.Atoi(stringValue)
 		if err != nil {
-			log.Println("Error in the format in trackingParallelHandler")
-			http.Error(w, err1.Error(), http.StatusInternalServerError)
+			log.Println("Error in the format of visitFrequencies in trackingParallelHandler")
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		visitFrequencies = append(visitFrequencies,intValue)
+	}
+	if len(visitFrequencies) < 1 {
+		log.Println("Not enough arguments for visitFrequencies in trackingParallelHandler")
+		http.Error(w, "Not enough arguments for visitFrequencies", http.StatusBadRequest)
+		return
 	}
 
 
