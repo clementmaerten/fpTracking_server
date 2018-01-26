@@ -96,13 +96,16 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 
 	number, err1 := strconv.Atoi(r.FormValue("fpTrackingParallelNumber"))
 	minNbPerUser, err2 := strconv.Atoi(r.FormValue("fpTrackingParallelMinNbPerUser"))
+	goroutineNumber, err3 := strconv.Atoi(r.FormValue("fpTrackingParallelGoroutineNumber"))
 	//train := float64(0)
-	if err1 != nil || err2 != nil || number <= 0 || minNbPerUser <= 0 {
+	if err1 != nil || err2 != nil || err3 != nil || number <= 0 || minNbPerUser <= 0 || goroutineNumber <= 0 {
 		log.Println("Error in the format in trackingParallelHandler")
 		if err1 != nil {
 			http.Error(w, err1.Error(), http.StatusBadRequest)
 		} else if err2 != nil {
 			http.Error(w, err2.Error(), http.StatusBadRequest)
+		} else if err3 != nil {
+			http.Error(w, err3.Error(), http.StatusBadRequest)
 		} else {
 			http.Error(w, "Nul or negative parameters", http.StatusBadRequest)
 		}
@@ -128,7 +131,7 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 
 
 	log.Println("trackingParallelHandler launched with number =",number,
-		", minNbPerUser =",minNbPerUser,", visitFrequencies =",visitFrequencies)
+		", minNbPerUser =",minNbPerUser,", visitFrequencies =",visitFrequencies,", goroutineNumber =",goroutineNumber)
 
 	/*fingerprintManager := fpTracking.FingerprintManager{
 		Number: number,
