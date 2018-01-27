@@ -10,12 +10,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"strconv"
 	"os/signal"
-	//"encoding/json"
+	"encoding/json"
 	"path"
 	"html/template"
-	//"github.com/clementmaerten/fpTracking"
+	"github.com/clementmaerten/fpTracking"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -97,7 +98,7 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 	number, err1 := strconv.Atoi(r.FormValue("fpTrackingParallelNumber"))
 	minNbPerUser, err2 := strconv.Atoi(r.FormValue("fpTrackingParallelMinNbPerUser"))
 	goroutineNumber, err3 := strconv.Atoi(r.FormValue("fpTrackingParallelGoroutineNumber"))
-	//train := float64(0)
+	train := float64(0)
 	if err1 != nil || err2 != nil || err3 != nil || number <= 0 || minNbPerUser <= 0 || goroutineNumber <= 0 {
 		log.Println("Error in the format in trackingParallelHandler")
 		if err1 != nil {
@@ -133,7 +134,11 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("trackingParallelHandler launched with number =",number,
 		", minNbPerUser =",minNbPerUser,", visitFrequencies =",visitFrequencies,", goroutineNumber =",goroutineNumber)
 
-	/*fingerprintManager := fpTracking.FingerprintManager{
+	progressChannel := make(chan fpTracking.ProgressMessage, 100)
+	defer close(progressChannel)
+	go listenProgressChannel(progressChannel)
+
+	fingerprintManager := fpTracking.FingerprintManager{
 		Number: number,
 		Train:  train,
 		MinNumberFpPerUser: minNbPerUser,
@@ -153,11 +158,13 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 	var jsonResults []fpTracking.ResultsForVisitFrequency
 
 	for _, visitFrequency := range visitFrequencies {
-		//DANS UN PREMIER TEMPS EN SEQUENTIEL POUR LE TEST
-		scenarioResult := fpTracking.ReplayScenario(test, visitFrequency, fpTracking.RuleBasedLinking)
+		scenarioResult := fpTracking.ReplayScenarioParallelWithProgressInformation(test,
+			visitFrequency, fpTracking.RuleBasedLinkingParallel, goroutineNumber, progressChannel)
 
 		jsonResults = append(jsonResults,fpTracking.AnalyseScenarioResultInJSON(visitFrequency, scenarioResult, test))
 	}
+
+	progressChannel <- fpTracking.ProgressMessage{Task : fpTracking.CLOSE_GOROUTINE}
 
 	js, err := json.Marshal(jsonResults)
 	if err != nil {
@@ -167,5 +174,22 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 
 	//w.Header().Set("Server","A Fingerprint tracking Go WebServer")
 	w.Header().Set("Content-Type","application/json; charset=utf-8")
-	w.Write(js)*/
+	w.Write(js)
+}
+
+//This function listen to the progress channel and update the user's session with progress information
+//This function is supposed to be executed by a goroutine
+func listenProgressChannel(ch <- chan fpTracking.ProgressMessage) {
+	for {
+		rq := <- ch
+		if strings.Compare(rq.Task, fpTracking.SEND_PROGRESS_INFORMATION) == 0 {
+			log.Println("visitFrequency :",rq.VisitFrequency,", progression :",rq.Progression)
+		} else if strings.Compare(rq.Task, fpTracking.CLOSE_GOROUTINE) == 0 {
+			return
+		} else {
+			//This case should never happen
+			log.Println("Wrong task for listenProgressChannel")
+			return
+		}
+	}
 }
