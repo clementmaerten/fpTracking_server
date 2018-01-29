@@ -136,7 +136,7 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 
 	progressChannel := make(chan fpTracking.ProgressMessage, 100)
 	defer close(progressChannel)
-	go listenProgressChannel(progressChannel)
+	go listenFpTrackingProgressChannel(progressChannel)
 
 	fingerprintManager := fpTracking.FingerprintManager{
 		Number: number,
@@ -179,7 +179,7 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 
 //This function listen to the progress channel and update the user's session with progress information
 //This function is supposed to be executed by a goroutine
-func listenProgressChannel(ch <- chan fpTracking.ProgressMessage) {
+func listenFpTrackingProgressChannel(ch <- chan fpTracking.ProgressMessage) {
 	for {
 		rq := <- ch
 		if strings.Compare(rq.Task, fpTracking.SEND_PROGRESS_INFORMATION) == 0 {
@@ -188,7 +188,7 @@ func listenProgressChannel(ch <- chan fpTracking.ProgressMessage) {
 			return
 		} else {
 			//This case should never happen
-			log.Println("Wrong task for listenProgressChannel")
+			log.Println("Wrong task for listenFpTrackingProgressChannel")
 			return
 		}
 	}
