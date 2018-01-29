@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sort"
 	"strconv"
 	"os/signal"
 	"encoding/json"
@@ -24,8 +25,8 @@ const TEMPLATES_FOLDER = "templates"
 
 func handledFunctions() {
 	http.HandleFunc("/",indexHandler)
-	http.HandleFunc("/testPost/", testPostHandler)
-	http.HandleFunc("/tracking_parallel/",trackingParallelHandler)
+	http.HandleFunc("/test-post/", testPostHandler)
+	http.HandleFunc("/tracking-parallel/",trackingParallelHandler)
 }
 
 func main() {
@@ -130,6 +131,9 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//Sort the visitFrequencies
+	sort.Ints(visitFrequencies)
+
 
 	log.Println("trackingParallelHandler launched with number =",number,
 		", minNbPerUser =",minNbPerUser,", visitFrequencies =",visitFrequencies,", goroutineNumber =",goroutineNumber)
@@ -151,9 +155,7 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	fmt.Printf("Start fetching fingerprints\n")
 	_, test := fingerprintManager.GetFingerprints()
-	fmt.Printf("Fetched %d fingerprints\n", len(test))
 
 	var jsonResults []fpTracking.ResultsForVisitFrequency
 

@@ -26,7 +26,7 @@ $('#fpTrackingParallelForm').submit(() => {
 	} else {
 		//send the request
 		$.ajax({
-			url: 'tracking_parallel/',
+			url: 'tracking-parallel/',
 			type: 'POST',
 			data: $('#fpTrackingParallelForm').serialize(),
 			success: (data) => {

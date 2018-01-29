@@ -8,72 +8,83 @@
 	</head>
 	<body>
 		<h1 align="center">The Fingerprint Tracking algorithms</h1>
-		<br>
+		<br><br>
 
-		<div class="container" align="center">
-			<form id="fpTrackingParallelForm">
-				<table>
-					<tr>
-						<td>Number of fingerprints :</td>
-						<td><input type="text" name="fpTrackingParallelNumber" id="fpTrackingParallelNumberId" placeholder="Number"></td>
-					</tr>
-					<tr>
-						<td>Minimum number of fingerprints per user :</td>
-						<td><input type="text" name="fpTrackingParallelMinNbPerUser" id="fpTrackingParallelMinNbPerUserId" placeholder="MinNbPerUser"></td>
-					</tr>
-					<tr>
-						<td>Number of goroutines :</td>
-						<td><input type="text" name="fpTrackingParallelGoroutineNumber" id="fpTrackingParallelGoroutineNumberId" placeholder="Goroutine number"></td>
-					</tr>
-					<tr>
-						<td>Visit frequencies :</td>
-						<td>
-							<table>
-								<tr>
-									<td>1 : </td>
-									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="1"></td>
-									<td>2 : </td>
-									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="2"></td>
-									<td>3 : </td>
-									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="3"></td>
-								</tr>
-								<tr>
-									<td>4 : </td>
-									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="4"></td>
-									<td>5 : </td>
-									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="5"></td>
-									<td>6 : </td>
-									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="6"></td>
-								</tr>
-								<tr>
-									<td>7 : </td>
-									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="7"></td>
-									<td>8 : </td>
-									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="8"></td>
-									<td>9 : </td>
-									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="9"></td>
-								</tr>
-								<tr>
-									<td>10 : </td>
-									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="10"></td>
-									<td>15 : </td>
-									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="15"></td>
-									<td>20 : </td>
-									<td><input type="checkbox" name="fpTrackingParallelVisitFrequency" value="20"></td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-				</table>
-				<table>
-					<tr>
-						<td><input type="submit" class="btn btn-primary" value="Launch the tracking program"></td>
-					</tr>
-				</table>
+		<div class="container">
+
+			<form class="col-4" id="fpTrackingParallelForm">
+				<div class="form-group">
+					<label for="fpTrackingParallelNumberId">Number of fingerprints</label>
+					<input type="text" class="form-control" name="fpTrackingParallelNumber" id="fpTrackingParallelNumberId" placeholder="Number">
+				</div>
+				<div class="form-group">
+					<label for="fpTrackingParallelMinNbPerUserId">Minimum number of fingerprints per user</label>
+					<input type="text" class="form-control" name="fpTrackingParallelMinNbPerUser" id="fpTrackingParallelMinNbPerUserId" placeholder="Minimum number per user">
+				</div>
+				<div class="form-group">
+					<label for="fpTrackingParallelGoroutineNumberId">Number of goroutines</label>
+					<input type="text" class="form-control" name="fpTrackingParallelGoroutineNumber" id="fpTrackingParallelGoroutineNumberId" placeholder="Goroutine number">
+				</div>
+				<label for="checkId">Visit frequencies</label>
+				<div id="checkId">
+					<div class="form-check form-check-inline">
+						<input class="form-check-input" name="fpTrackingParallelVisitFrequency" type="checkbox" id="check1" value="1">
+						<label class="form-check-label" for="check1">1</label>
+					</div>
+					<div class="form-check form-check-inline">
+						<input class="form-check-input" name="fpTrackingParallelVisitFrequency" type="checkbox" id="check4" value="4">
+						<label class="form-check-label" for="check4">4</label>
+					</div>
+					<div class="form-check form-check-inline">
+						<input class="form-check-input" name="fpTrackingParallelVisitFrequency" type="checkbox" id="check7" value="7">
+						<label class="form-check-label" for="check7">7</label>
+					</div>
+					<div class="form-check form-check-inline">
+						<input class="form-check-input" name="fpTrackingParallelVisitFrequency" type="checkbox" id="check10" value="10">
+						<label class="form-check-label" for="check10">10</label>
+					</div>
+					<br>
+					<div class="form-check form-check-inline">
+						<input class="form-check-input" name="fpTrackingParallelVisitFrequency" type="checkbox" id="check2" value="2">
+						<label class="form-check-label" for="check2">2</label>
+					</div>
+					<div class="form-check form-check-inline">
+						<input class="form-check-input" name="fpTrackingParallelVisitFrequency" type="checkbox" id="check5" value="5">
+						<label class="form-check-label" for="check5">5</label>
+					</div>
+					<div class="form-check form-check-inline">
+						<input class="form-check-input" name="fpTrackingParallelVisitFrequency" type="checkbox" id="check8" value="8">
+						<label class="form-check-label" for="check8">8</label>
+					</div>
+					<div class="form-check form-check-inline">
+						<input class="form-check-input" name="fpTrackingParallelVisitFrequency" type="checkbox" id="check15" value="15">
+						<label class="form-check-label" for="check15">15</label>
+					</div>
+					<br>
+					<div class="form-check form-check-inline">
+						<input class="form-check-input" name="fpTrackingParallelVisitFrequency" type="checkbox" id="check3" value="3">
+						<label class="form-check-label" for="check3">3</label>
+					</div>
+					<div class="form-check form-check-inline">
+						<input class="form-check-input" name="fpTrackingParallelVisitFrequency" type="checkbox" id="check6" value="6">
+						<label class="form-check-label" for="check6">6</label>
+					</div>
+					<div class="form-check form-check-inline">
+						<input class="form-check-input" name="fpTrackingParallelVisitFrequency" type="checkbox" id="check9" value="9">
+						<label class="form-check-label" for="check9">9</label>
+					</div>
+					<div class="form-check form-check-inline">
+						<input class="form-check-input" name="fpTrackingParallelVisitFrequency" type="checkbox" id="check20" value="20">
+						<label class="form-check-label" for="check20">20</label>
+					</div>
+				</div>
+				<br>
+				<button type="submit" class="btn btn-primary">Launch the tracking program</button>
 			</form>
-
+			
+			<br>
 			<div id="fpTrackingParallelResultsId">
-				<div class="alert alert-warning" role="alert" id="fpTrackingParallelResultsErrorAlertId" style="display: none;"></div>
+				<div class="alert alert-warning col-4" role="alert" id="fpTrackingParallelResultsErrorAlertId" style="display: none;"></div>
 			</div>
 		</div>
 
