@@ -10,24 +10,32 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"github.com/gorilla/mux"
 )
 
 const TEMPLATES_FOLDER = "templates"
 
-func handledFunctions() {
-	http.HandleFunc("/",indexHandler)
-	http.HandleFunc("/test-post/", testPostHandler)
-	http.HandleFunc("/tracking-parallel/",trackingParallelHandler)
-}
-
 func main() {
 	log.Println("Starting HTTP server on http://localhost:8080")
+
+	//Create the router and handle the URLs
+	r := mux.NewRouter()
+	r.HandleFunc("/",indexHandler)
+	r.HandleFunc("/test-post", testPostHandler)
+	r.HandleFunc("/tracking-parallel",trackingParallelHandler)
+
+	//Handled static files (like CSS and JS)
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
 
 	// subscribe to SIGINT signals
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 
-	srv := &http.Server{Addr: ":8080", Handler: http.DefaultServeMux}
+	srv := &http.Server{
+		Handler: r,
+		Addr: ":8080",
+	}
 	go func() {
 		<-quit
 		log.Println("Shutting down server...")
@@ -36,11 +44,6 @@ func main() {
 		}
 	}()
 
-	//Handled functions
-	handledFunctions()
-
-	//Handled static files (like CSS and JS)
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	//Start the server and listen to requests
 	err := srv.ListenAndServe()
