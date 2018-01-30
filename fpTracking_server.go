@@ -138,9 +138,7 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("trackingParallelHandler launched with number =",number,
 		", minNbPerUser =",minNbPerUser,", visitFrequencies =",visitFrequencies,", goroutineNumber =",goroutineNumber)
 
-	progressChannel := make(chan fpTracking.ProgressMessage, 100)
-	defer close(progressChannel)
-	go listenFpTrackingProgressChannel(progressChannel)
+
 
 	fingerprintManager := fpTracking.FingerprintManager{
 		Number: number,
@@ -159,9 +157,28 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 
 	var jsonResults []fpTracking.ResultsForVisitFrequency
 
+
+	//We calculate all the replaySequence to know the total number of fingerprints to analyze
+	//We store these replay sequences and we send them to the ReplayScenario program.
+	visitFrequencyToReplaySequence := make(map[int][]fpTracking.SequenceElt)
+	lengths := make(map[int]int)
+	totalLength := 0
+	for _, visitFreq := range visitFrequencies {
+		visitFrequencyToReplaySequence[visitFreq] = fpTracking.GenerateReplaySequence(test,visitFreq)
+		lengths[visitFreq] = len(visitFrequencyToReplaySequence[visitFreq])
+		totalLength += lengths[visitFreq]
+	}
+
+	//We create the channel and we lauch the goroutine which is going to listen to the messages
+	progressChannel := make(chan fpTracking.ProgressMessage, 100)
+	defer close(progressChannel)
+	go listenFpTrackingProgressChannel(totalLength, visitFrequencies, lengths, progressChannel)
+
+
 	for _, visitFrequency := range visitFrequencies {
 		scenarioResult := fpTracking.ReplayScenarioParallelWithProgressInformation(test,
-			visitFrequency, fpTracking.RuleBasedLinkingParallel, goroutineNumber, progressChannel)
+			visitFrequency, fpTracking.RuleBasedLinkingParallel, goroutineNumber,
+			visitFrequencyToReplaySequence[visitFrequency], progressChannel)
 
 		jsonResults = append(jsonResults,fpTracking.AnalyseScenarioResultInJSON(visitFrequency, scenarioResult, test))
 	}
@@ -179,14 +196,37 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(js)
 }
 
+
+
+
+
+//PLACE THE FUNCTIONS BELOW IN A NEW FILE ?
+
 //This function listen to the progress channel and update the user's session with progress information
 //This function is supposed to be executed by a goroutine
-func listenFpTrackingProgressChannel(ch <- chan fpTracking.ProgressMessage) {
+func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []int, lengths map[int]int,
+	ch <- chan fpTracking.ProgressMessage) {
+
+	currentVisitFrequency := sortedVisitFrequencies[0]
+	indexAtNewVisitFrequency := 0
+	globalProgression := 0
+	
 	for {
 		rq := <- ch
 		if strings.Compare(rq.Task, fpTracking.SEND_PROGRESS_INFORMATION) == 0 {
-			log.Println("visitFrequency :",rq.VisitFrequency,", progression :",rq.Progression)
+
+			if rq.VisitFrequency != currentVisitFrequency {
+				indexAtNewVisitFrequency += lengths[currentVisitFrequency]
+				currentVisitFrequency = rq.VisitFrequency
+				log.Println("new visitFrequency :",currentVisitFrequency)
+			}
+
+			globalProgression = (indexAtNewVisitFrequency + rq.Index) * 100 / totalLength
+
+			log.Println("progression :",globalProgression)
+
 		} else if strings.Compare(rq.Task, fpTracking.CLOSE_GOROUTINE) == 0 {
+			log.Println("progression : 100")
 			return
 		} else {
 			//This case should never happen
