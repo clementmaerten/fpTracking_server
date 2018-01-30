@@ -1,65 +1,17 @@
-//Website for the differents response types : http://www.alexedwards.net/blog/golang-response-snippets
-//Website for the web sessions : http://www.gorillatoolkit.org/pkg/sessions
-//Website for the ECMA6 : https://www.wanadev.fr/21-introduction-a-ecmascript-6-le-javascript-de-demain/
-
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"strings"
 	"sort"
 	"strconv"
-	"os/signal"
 	"encoding/json"
 	"path"
 	"html/template"
 	"github.com/clementmaerten/fpTracking"
 	_ "github.com/go-sql-driver/mysql"
 )
-
-const TEMPLATES_FOLDER = "templates"
-
-func handledFunctions() {
-	http.HandleFunc("/",indexHandler)
-	http.HandleFunc("/test-post/", testPostHandler)
-	http.HandleFunc("/tracking-parallel/",trackingParallelHandler)
-}
-
-func main() {
-	log.Println("Starting HTTP server on http://localhost:8080")
-
-	// subscribe to SIGINT signals
-	quit := make(chan os.Signal)
-	signal.Notify(quit, os.Interrupt)
-
-	srv := &http.Server{Addr: ":8080", Handler: http.DefaultServeMux}
-	go func() {
-		<-quit
-		log.Println("Shutting down server...")
-		if err := srv.Shutdown(context.Background()); err != nil {
-			log.Fatalf("could not shutdown: %v", err)
-		}
-	}()
-
-	//Handled functions
-	handledFunctions()
-
-	//Handled static files (like CSS and JS)
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-
-	//Start the server and listen to requests
-	err := srv.ListenAndServe()
-	if err != http.ErrServerClosed {
-		log.Fatalf("listen: %s\n", err)
-	}
-
-
-	log.Println("Server stopped")
-}
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Server","A Fingerprint tracking Go WebServer")
@@ -194,44 +146,4 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 	//w.Header().Set("Server","A Fingerprint tracking Go WebServer")
 	w.Header().Set("Content-Type","application/json; charset=utf-8")
 	w.Write(js)
-}
-
-
-
-
-
-//PLACE THE FUNCTIONS BELOW IN A NEW FILE ?
-
-//This function listen to the progress channel and update the user's session with progress information
-//This function is supposed to be executed by a goroutine
-func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []int, lengths map[int]int,
-	ch <- chan fpTracking.ProgressMessage) {
-
-	currentVisitFrequency := sortedVisitFrequencies[0]
-	indexAtNewVisitFrequency := 0
-	globalProgression := 0
-	
-	for {
-		rq := <- ch
-		if strings.Compare(rq.Task, fpTracking.SEND_PROGRESS_INFORMATION) == 0 {
-
-			if rq.VisitFrequency != currentVisitFrequency {
-				indexAtNewVisitFrequency += lengths[currentVisitFrequency]
-				currentVisitFrequency = rq.VisitFrequency
-				log.Println("new visitFrequency :",currentVisitFrequency)
-			}
-
-			globalProgression = (indexAtNewVisitFrequency + rq.Index) * 100 / totalLength
-
-			log.Println("progression :",globalProgression)
-
-		} else if strings.Compare(rq.Task, fpTracking.CLOSE_GOROUTINE) == 0 {
-			log.Println("progression : 100")
-			return
-		} else {
-			//This case should never happen
-			log.Println("Wrong task for listenFpTrackingProgressChannel")
-			return
-		}
-	}
 }
