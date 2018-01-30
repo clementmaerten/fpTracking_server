@@ -15,15 +15,19 @@ function deleteErrorMessage(errorMessageId) {
 $('#fpTrackingParallelForm').submit(() => {
 	
 	//verify parameters
-	let number = parseInt($('#fpTrackingParallelNumberId').val());
-	let minNbPerUser = parseInt($('#fpTrackingParallelMinNbPerUserId').val());
-	let goroutineNumber = parseInt($('#fpTrackingParallelGoroutineNumberId').val());
+	const number = parseInt($('#fpTrackingParallelNumberId').val());
+	const minNbPerUser = parseInt($('#fpTrackingParallelMinNbPerUserId').val());
+	const goroutineNumber = parseInt($('#fpTrackingParallelGoroutineNumberId').val());
 
 	if (isNaN(number) || isNaN(minNbPerUser)  || isNaN(goroutineNumber)){
 		triggerErrorMessage('fpTrackingParallelResultsErrorAlertId','Invalid format for parameters');
 	} else if (number <= 0 || minNbPerUser <=0 || goroutineNumber <=0) {
 		triggerErrorMessage('fpTrackingParallelResultsErrorAlertId','nul or negative parameters');
 	} else {
+
+		//Begin the check of progression every second
+		const checkIntervalId = setInterval(checkProgression,1000);
+
 		//send the request
 		$.ajax({
 			url: 'tracking-parallel',
@@ -32,6 +36,9 @@ $('#fpTrackingParallelForm').submit(() => {
 			success: (data) => {
 				//clear the error alerts
 				deleteErrorMessage('fpTrackingParallelResultsErrorAlertId');
+
+				//stop checkProgression
+				clearInterval(checkIntervalId);
 			},
 			error: (e) => {
 				triggerErrorMessage('fpTrackingParallelResultsErrorAlertId','The server wasn\'t able to process the request');
@@ -42,3 +49,7 @@ $('#fpTrackingParallelForm').submit(() => {
 	//We return false so that the function doesn't refresh the page
 	return false;
 });
+
+function checkProgression (){
+
+}

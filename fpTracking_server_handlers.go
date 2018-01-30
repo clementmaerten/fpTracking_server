@@ -14,6 +14,19 @@ import (
 )
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
+
+	//We check if the user has already the cookie
+	//If he doesn't have, we give him one
+	//The cookie contains a personal userId
+	session, _ := store.Get(r, "fpTracking-cookie")
+	if session.IsNew {
+		log.Println("We create a new cookie")
+		session.Values["userId"] = generate_new_id()
+		session.Save(r, w)
+	}
+	log.Println("userId :",session.Values["userId"])
+
+
 	w.Header().Set("Server","A Fingerprint tracking Go WebServer")
 	w.Header().Set("Content-Type","text/html; charset=UTF-8")
 
@@ -124,7 +137,7 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 	//We create the channel and we lauch the goroutine which is going to listen to the messages
 	progressChannel := make(chan fpTracking.ProgressMessage, 100)
 	defer close(progressChannel)
-	go listenFpTrackingProgressChannel(totalLength, visitFrequencies, lengths, progressChannel)
+	go listenFpTrackingProgressChannel(totalLength, visitFrequencies, lengths, "test",progressChannel)
 
 
 	for _, visitFrequency := range visitFrequencies {

@@ -2,14 +2,20 @@ package main
 
 import (
 	"log"
+	"fmt"
 	"strings"
+	"github.com/satori/go.uuid"
 	"github.com/clementmaerten/fpTracking"
 )
+
+type progressInformationStruct struct {
+	progression int
+}
 
 //This function listen to the progress channel and update the user's session with progress information
 //This function is supposed to be executed by a goroutine
 func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []int, lengths map[int]int,
-	ch <- chan fpTracking.ProgressMessage) {
+	userId string, ch <- chan fpTracking.ProgressMessage) {
 
 	currentVisitFrequency := sortedVisitFrequencies[0]
 	indexAtNewVisitFrequency := 0
@@ -28,9 +34,13 @@ func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []i
 			globalProgression = (indexAtNewVisitFrequency + rq.Index) * 100 / totalLength
 
 			log.Println("progression :",globalProgression)
+			progressInformationSession[userId] = progressInformationStruct{progression : globalProgression}
 
 		} else if strings.Compare(rq.Task, fpTracking.CLOSE_GOROUTINE) == 0 {
-			log.Println("progression : 100")
+			globalProgression = 100
+			log.Println("progression :",globalProgression)
+			progressInformationSession[userId] = progressInformationStruct{progression : globalProgression}
+			log.Println("progressInformationSession :",progressInformationSession)
 			return
 		} else {
 			//This case should never happen
@@ -38,4 +48,9 @@ func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []i
 			return
 		}
 	}
+}
+
+func generate_new_id() string {
+	gen, _ := uuid.NewV4()
+	return fmt.Sprintf("%s",gen)
 }

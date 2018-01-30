@@ -11,9 +11,18 @@ import (
 	"os"
 	"os/signal"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 )
 
 const TEMPLATES_FOLDER = "templates"
+
+//Global variables
+var progressInformationSession map[string]progressInformationStruct
+var (
+	key = []byte("super-secret-key")
+	store = sessions.NewCookieStore(key)
+)
+
 
 func main() {
 	log.Println("Starting HTTP server on http://localhost:8080")
@@ -44,6 +53,10 @@ func main() {
 		}
 	}()
 
+
+	//Initialization of the global variables
+	progressInformationSession = make(map[string]progressInformationStruct)
+	log.Println("progressInformationSession :",progressInformationSession)
 
 	//Start the server and listen to requests
 	err := srv.ListenAndServe()
