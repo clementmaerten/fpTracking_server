@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"path"
 	"html/template"
-	"github.com/clementmaerten/fpTracking"
 	"github.com/gorilla/sessions"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -140,64 +139,13 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 	sort.Ints(visitFrequencies)
 
 
-	log.Println("trackingParallelHandler launched with number =",number,
+	go launchTrackingAlgorithm(number, minNbPerUser, goroutineNumber,
+		train, visitFrequencies, session.Values["userId"].(string))
+
+	w.Header().Set("Content-Type","text/plain; charset=utf-8")
+
+	launchMessage := fmt.Sprintln("trackingParallelHandler launched with number =",number,
 		", minNbPerUser =",minNbPerUser,", visitFrequencies =",visitFrequencies,", goroutineNumber =",goroutineNumber)
-
-
-
-	fingerprintManager := fpTracking.FingerprintManager{
-		Number: number,
-		Train:  train,
-		MinNumberFpPerUser: minNbPerUser,
-		DBInfo: fpTracking.DBInformation {
-			DBType: "mysql",
-			User: "root",
-			Password: "mysql",
-			TCP: "",
-			DBName: "fingerprint",
-		},
-	}
-
-	_, test := fingerprintManager.GetFingerprints()
-
-	var jsonResults []fpTracking.ResultsForVisitFrequency
-
-
-	//We calculate all the replaySequence to know the total number of fingerprints to analyze
-	//We store these replay sequences and we send them to the ReplayScenario program.
-	visitFrequencyToReplaySequence := make(map[int][]fpTracking.SequenceElt)
-	lengths := make(map[int]int)
-	totalLength := 0
-	for _, visitFreq := range visitFrequencies {
-		visitFrequencyToReplaySequence[visitFreq] = fpTracking.GenerateReplaySequence(test,visitFreq)
-		lengths[visitFreq] = len(visitFrequencyToReplaySequence[visitFreq])
-		totalLength += lengths[visitFreq]
-	}
-
-	//We create the channel and we lauch the goroutine which is going to listen to the messages
-	progressChannel := make(chan fpTracking.ProgressMessage, 100)
-	defer close(progressChannel)
-	go listenFpTrackingProgressChannel(totalLength, visitFrequencies, lengths,
-		session.Values["userId"].(string), progressChannel)
-
-
-	for _, visitFrequency := range visitFrequencies {
-		scenarioResult := fpTracking.ReplayScenarioParallelWithProgressInformation(test,
-			visitFrequency, fpTracking.RuleBasedLinkingParallel, goroutineNumber,
-			visitFrequencyToReplaySequence[visitFrequency], progressChannel)
-
-		jsonResults = append(jsonResults,fpTracking.AnalyseScenarioResultInJSON(visitFrequency, scenarioResult, test))
-	}
-
-	progressChannel <- fpTracking.ProgressMessage{Task : fpTracking.CLOSE_GOROUTINE}
-
-	js, err := json.Marshal(jsonResults)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	//w.Header().Set("Server","A Fingerprint tracking Go WebServer")
-	w.Header().Set("Content-Type","application/json; charset=utf-8")
-	w.Write(js)
+	log.Println(launchMessage)
+	fmt.Fprintln(w, launchMessage)
 }

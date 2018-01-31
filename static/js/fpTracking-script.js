@@ -12,6 +12,8 @@ function deleteErrorMessage(errorMessageId) {
 	$(objectId).html('');
 }
 
+var checkIntervalId;
+
 $('#fpTrackingParallelForm').submit(() => {
 	
 	//verify parameters
@@ -25,20 +27,20 @@ $('#fpTrackingParallelForm').submit(() => {
 		triggerErrorMessage('fpTrackingParallelResultsErrorAlertId','nul or negative parameters');
 	} else {
 
-		//Begin the check of progression every second
-		const checkIntervalId = setInterval(checkProgression,1000);
-
 		//send the request
 		$.ajax({
 			url: 'tracking-parallel',
 			type: 'POST',
 			data: $('#fpTrackingParallelForm').serialize(),
 			success: (data) => {
+				//Begin the check of progression every second
+				checkIntervalId = setInterval(checkProgression,1000);
+
 				//stop checkProgression
-				clearInterval(checkIntervalId);
+				//clearInterval(checkIntervalId);
 
 				//launch for the last time the checkProgression function
-				checkProgression();
+				//checkProgression();
 
 				//clear the error alerts
 				deleteErrorMessage('fpTrackingParallelResultsErrorAlertId');
@@ -61,10 +63,12 @@ function checkProgression (){
 		url: 'check-progression',
 		type: 'POST',
 		success: (data) => {
-
+			if (data.Progression >= 100) {
+				clearInterval(checkIntervalId);
+			}
 		},
 		error: () => {
-			alert("Error in checkProgression");
+			//alert("Error in checkProgression");
 		}
 	});
 }
