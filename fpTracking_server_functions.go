@@ -9,7 +9,7 @@ import (
 )
 
 type progressInformationStruct struct {
-	progression int
+	Progression int
 }
 
 //This function listen to the progress channel and update the user's session with progress information
@@ -34,13 +34,12 @@ func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []i
 			globalProgression = (indexAtNewVisitFrequency + rq.Index) * 100 / totalLength
 
 			log.Println("progression :",globalProgression)
-			progressInformationSession[userId] = progressInformationStruct{progression : globalProgression}
+			progressInformationSession[userId] = progressInformationStruct{Progression : globalProgression}
 
 		} else if strings.Compare(rq.Task, fpTracking.CLOSE_GOROUTINE) == 0 {
+			
 			globalProgression = 100
-			log.Println("progression :",globalProgression)
-			progressInformationSession[userId] = progressInformationStruct{progression : globalProgression}
-			log.Println("progressInformationSession :",progressInformationSession)
+			progressInformationSession[userId] = progressInformationStruct{Progression : globalProgression}
 			return
 		} else {
 			//This case should never happen

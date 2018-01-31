@@ -34,13 +34,19 @@ $('#fpTrackingParallelForm').submit(() => {
 			type: 'POST',
 			data: $('#fpTrackingParallelForm').serialize(),
 			success: (data) => {
-				//clear the error alerts
-				deleteErrorMessage('fpTrackingParallelResultsErrorAlertId');
-
 				//stop checkProgression
 				clearInterval(checkIntervalId);
+
+				//launch for the last time the checkProgression function
+				checkProgression();
+
+				//clear the error alerts
+				deleteErrorMessage('fpTrackingParallelResultsErrorAlertId');
 			},
-			error: (e) => {
+			error: () => {
+				//stop checkProgression
+				clearInterval(checkIntervalId);
+
 				triggerErrorMessage('fpTrackingParallelResultsErrorAlertId','The server wasn\'t able to process the request');
 			}
 		});
@@ -51,5 +57,14 @@ $('#fpTrackingParallelForm').submit(() => {
 });
 
 function checkProgression (){
+	$.ajax({
+		url: 'check-progression',
+		type: 'POST',
+		success: (data) => {
 
+		},
+		error: () => {
+			alert("Error in checkProgression");
+		}
+	});
 }

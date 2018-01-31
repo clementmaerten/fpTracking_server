@@ -10,6 +10,7 @@ import (
 	"path"
 	"html/template"
 	"github.com/clementmaerten/fpTracking"
+	"github.com/gorilla/sessions"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -21,6 +22,11 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "fpTracking-cookie")
 	if session.IsNew {
 		log.Println("We create a new cookie")
+		session.Options = &sessions.Options{
+			Path: "/",
+			MaxAge: 86400, //The cookie last 1 day at maximum
+			HttpOnly: true,
+		}
 		session.Values["userId"] = generate_new_id()
 		session.Save(r, w)
 	}
@@ -55,7 +61,41 @@ func testPostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func checkProgressionHandler(w http.ResponseWriter, r *http.Request) {
+
+	//We check if the user has a cookie with a userId
+	session, _ := store.Get(r, "fpTracking-cookie")
+	if session.IsNew {
+		http.Error(w, "You don't have the cookie", http.StatusForbidden)
+		return
+	}
+
+	//We check if the tracking algorithm has begun
+	if _, is_present := progressInformationSession[session.Values["userId"].(string)]; !is_present {
+		http.Error(w, "The tracking algorithm wasn't launched", http.StatusForbidden)
+		return
+	}
+
+	js, err := json.Marshal(progressInformationSession[session.Values["userId"].(string)])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//w.Header().Set("Server","A Fingerprint tracking Go WebServer")
+	w.Header().Set("Content-Type","application/json; charset=utf-8")
+	w.Write(js)
+}
+
 func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
+
+
+	//We check if the user has a cookie with a userId
+	session, _ := store.Get(r, "fpTracking-cookie")
+	if session.IsNew {
+		http.Error(w, "You don't have the cookie", http.StatusForbidden)
+		return
+	}
 
 
 	//Parse the parameters in a map
@@ -137,7 +177,8 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 	//We create the channel and we lauch the goroutine which is going to listen to the messages
 	progressChannel := make(chan fpTracking.ProgressMessage, 100)
 	defer close(progressChannel)
-	go listenFpTrackingProgressChannel(totalLength, visitFrequencies, lengths, "test",progressChannel)
+	go listenFpTrackingProgressChannel(totalLength, visitFrequencies, lengths,
+		session.Values["userId"].(string), progressChannel)
 
 
 	for _, visitFrequency := range visitFrequencies {
