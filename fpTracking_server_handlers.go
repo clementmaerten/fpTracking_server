@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"path"
 	"html/template"
+	"github.com/clementmaerten/fpTracking"
 	"github.com/gorilla/sessions"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -62,8 +63,8 @@ func testPostHandler(w http.ResponseWriter, r *http.Request) {
 
 func checkProgressionHandler(w http.ResponseWriter, r *http.Request) {
 
-	//We lock the mutex in order to have a clean read access to progressInformationSession
-	lock.RLock()
+	//We lock the mutex in order to have a clean read and write access to progressInformationSession
+	lock.Lock()
 
 	//We check if the user has a cookie with a userId
 	session, _ := store.Get(r, "fpTracking-cookie")
@@ -72,16 +73,23 @@ func checkProgressionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userId := session.Values["userId"].(string)
+
 	//We check if the tracking algorithm has begun
-	if _, is_present := progressInformationSession[session.Values["userId"].(string)]; !is_present {
+	if _, is_present := progressInformationSession[userId]; !is_present {
 		http.Error(w, "The tracking algorithm wasn't launched", http.StatusForbidden)
 		return
 	}
 
-	js, err := json.Marshal(progressInformationSession[session.Values["userId"].(string)])
+	js, err := json.Marshal(progressInformationSession[userId])
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+
+	//We delete the results in the map in order to not send them more than once
+	if len(progressInformationSession[userId].Results) >= 1 {
+		progressInformationSession[userId].Results = []fpTracking.ResultsForVisitFrequency{}
 	}
 
 	//w.Header().Set("Server","A Fingerprint tracking Go WebServer")
@@ -89,7 +97,7 @@ func checkProgressionHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(js)
 
 	//We unlock the mutex
-	lock.RUnlock()
+	lock.Unlock()
 }
 
 func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
