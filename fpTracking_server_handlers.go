@@ -26,7 +26,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			MaxAge: 86400, //The cookie last 1 day at maximum
 			HttpOnly: true,
 		}
-		session.Values["userId"] = generate_new_id()
+		session.Values["userId"] = generateNewId()
 		session.Save(r, w)
 	}
 	log.Println("userId :",session.Values["userId"])
@@ -65,7 +65,7 @@ func checkProgressionHandler(w http.ResponseWriter, r *http.Request) {
 	//We check if the user has a cookie with a userId
 	session, _ := store.Get(r, "fpTracking-cookie")
 	if session.IsNew {
-		http.Error(w, "You don't have the cookie", http.StatusForbidden)
+		http.Error(w, "Cookie not found", http.StatusForbidden)
 		return
 	}
 
@@ -92,7 +92,7 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 	//We check if the user has a cookie with a userId
 	session, _ := store.Get(r, "fpTracking-cookie")
 	if session.IsNew {
-		http.Error(w, "You don't have the cookie", http.StatusForbidden)
+		http.Error(w, "Cookie not found", http.StatusForbidden)
 		return
 	}
 

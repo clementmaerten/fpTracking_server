@@ -17,7 +17,7 @@ import (
 const TEMPLATES_FOLDER = "templates"
 
 //Global variables
-var progressInformationSession map[string]progressInformationStruct
+var progressInformationSession map[string]*progressInformationStruct
 var (
 	key = []byte("super-secret-key")
 	store = sessions.NewCookieStore(key)
@@ -56,7 +56,7 @@ func main() {
 
 
 	//Initialization of the global variables
-	progressInformationSession = make(map[string]progressInformationStruct)
+	progressInformationSession = make(map[string]*progressInformationStruct)
 	log.Println("progressInformationSession :",progressInformationSession)
 
 	//Start the server and listen to requests

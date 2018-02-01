@@ -24,7 +24,7 @@ $('#fpTrackingParallelForm').submit(() => {
 	if (isNaN(number) || isNaN(minNbPerUser)  || isNaN(goroutineNumber)){
 		triggerErrorMessage('fpTrackingParallelResultsErrorAlertId','Invalid format for parameters');
 	} else if (number <= 0 || minNbPerUser <=0 || goroutineNumber <=0) {
-		triggerErrorMessage('fpTrackingParallelResultsErrorAlertId','nul or negative parameters');
+		triggerErrorMessage('fpTrackingParallelResultsErrorAlertId','Nul or negative parameters');
 	} else {
 
 		//send the request
@@ -33,22 +33,13 @@ $('#fpTrackingParallelForm').submit(() => {
 			type: 'POST',
 			data: $('#fpTrackingParallelForm').serialize(),
 			success: (data) => {
-				//Begin the check of progression every second
-				checkIntervalId = setInterval(checkProgression,1000);
-
-				//stop checkProgression
-				//clearInterval(checkIntervalId);
-
-				//launch for the last time the checkProgression function
-				//checkProgression();
-
 				//clear the error alerts
 				deleteErrorMessage('fpTrackingParallelResultsErrorAlertId');
+
+				//Begin the check of progression every second
+				checkIntervalId = setInterval(checkProgression,1000);
 			},
 			error: () => {
-				//stop checkProgression
-				clearInterval(checkIntervalId);
-
 				triggerErrorMessage('fpTrackingParallelResultsErrorAlertId','The server wasn\'t able to process the request');
 			}
 		});

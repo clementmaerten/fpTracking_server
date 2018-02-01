@@ -8,8 +8,11 @@ import (
 	"github.com/clementmaerten/fpTracking"
 )
 
+
+
 type progressInformationStruct struct {
 	Progression int
+	Results []fpTracking.ResultsForVisitFrequency
 }
 
 //This function listen to the progress channel and update the user's session with progress information
@@ -20,6 +23,10 @@ func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []i
 	currentVisitFrequency := sortedVisitFrequencies[0]
 	indexAtNewVisitFrequency := 0
 	globalProgression := 0
+
+	if progressInformationSession[userId] == nil {
+		progressInformationSession[userId] = &progressInformationStruct{}
+	}
 	
 	for {
 		rq := <- ch
@@ -34,12 +41,15 @@ func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []i
 			globalProgression = (indexAtNewVisitFrequency + rq.Index) * 100 / totalLength
 
 			log.Println("progression :",globalProgression)
-			progressInformationSession[userId] = progressInformationStruct{Progression : globalProgression}
+			progressInformationSession[userId].Progression = globalProgression
 
+		} else if strings.Compare(rq.Task, fpTracking.SEND_RESULTS_FOR_VISIT_FREQUENCY) == 0 {
+
+			progressInformationSession[userId].Results = append(progressInformationSession[userId].Results, rq.ResForVisitFreq)
 		} else if strings.Compare(rq.Task, fpTracking.CLOSE_GOROUTINE) == 0 {
 
 			globalProgression = 100
-			progressInformationSession[userId] = progressInformationStruct{Progression : globalProgression}
+			progressInformationSession[userId].Progression = globalProgression
 			return
 		} else {
 			//This case should never happen
@@ -49,7 +59,7 @@ func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []i
 	}
 }
 
-func generate_new_id() string {
+func generateNewId() string {
 	gen, _ := uuid.NewV4()
 	return fmt.Sprintf("%s",gen)
 }
@@ -71,8 +81,6 @@ func launchTrackingAlgorithm(number int, minNbPerUser int, goroutineNumber int,
 	}
 
 	_, test := fingerprintManager.GetFingerprints()
-
-	var jsonResults []fpTracking.ResultsForVisitFrequency
 
 
 	//We calculate all the replaySequence to know the total number of fingerprints to analyze
@@ -98,7 +106,11 @@ func launchTrackingAlgorithm(number int, minNbPerUser int, goroutineNumber int,
 			visitFrequency, fpTracking.RuleBasedLinkingParallel, goroutineNumber,
 			visitFrequencyToReplaySequence[visitFrequency], progressChannel)
 
-		jsonResults = append(jsonResults,fpTracking.AnalyseScenarioResultInJSON(visitFrequency, scenarioResult, test))
+		log.Println("We send the results for visitFrequency",visitFrequency)
+		progressChannel <- fpTracking.ProgressMessage {
+			Task : fpTracking.SEND_RESULTS_FOR_VISIT_FREQUENCY,
+			ResForVisitFreq : fpTracking.AnalyseScenarioResultInJSON(visitFrequency, scenarioResult, test),
+		}
 	}
 
 	progressChannel <- fpTracking.ProgressMessage{Task : fpTracking.CLOSE_GOROUTINE}
