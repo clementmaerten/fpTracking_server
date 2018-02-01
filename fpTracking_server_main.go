@@ -6,6 +6,7 @@ package main
 
 import (
 	"context"
+	"sync"
 	"log"
 	"net/http"
 	"os"
@@ -18,6 +19,7 @@ const TEMPLATES_FOLDER = "templates"
 
 //Global variables
 var progressInformationSession map[string]*progressInformationStruct
+var lock = sync.RWMutex{}
 var (
 	key = []byte("super-secret-key")
 	store = sessions.NewCookieStore(key)

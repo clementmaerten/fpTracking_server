@@ -24,9 +24,12 @@ func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []i
 	indexAtNewVisitFrequency := 0
 	globalProgression := 0
 
+	//We lock the mutex in order to have a clean write access to progressInformationSession
+	lock.Lock()
 	if progressInformationSession[userId] == nil {
 		progressInformationSession[userId] = &progressInformationStruct{}
 	}
+	lock.Unlock()
 	
 	for {
 		rq := <- ch
@@ -41,15 +44,25 @@ func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []i
 			globalProgression = (indexAtNewVisitFrequency + rq.Index) * 100 / totalLength
 
 			log.Println("progression :",globalProgression)
+
+			//We lock the mutex in order to have a clean write access to progressInformationSession
+			lock.Lock()
 			progressInformationSession[userId].Progression = globalProgression
+			lock.Unlock()
 
 		} else if strings.Compare(rq.Task, fpTracking.SEND_RESULTS_FOR_VISIT_FREQUENCY) == 0 {
 
+			//We lock the mutex in order to have a clean write access to progressInformationSession
+			lock.Lock()
 			progressInformationSession[userId].Results = append(progressInformationSession[userId].Results, rq.ResForVisitFreq)
+			lock.Unlock()
 		} else if strings.Compare(rq.Task, fpTracking.CLOSE_GOROUTINE) == 0 {
 
 			globalProgression = 100
+			//We lock the mutex in order to have a clean write access to progressInformationSession
+			lock.Lock()
 			progressInformationSession[userId].Progression = globalProgression
+			lock.Unlock()
 			return
 		} else {
 			//This case should never happen

@@ -62,6 +62,9 @@ func testPostHandler(w http.ResponseWriter, r *http.Request) {
 
 func checkProgressionHandler(w http.ResponseWriter, r *http.Request) {
 
+	//We lock the mutex in order to have a clean read access to progressInformationSession
+	lock.RLock()
+
 	//We check if the user has a cookie with a userId
 	session, _ := store.Get(r, "fpTracking-cookie")
 	if session.IsNew {
@@ -84,6 +87,9 @@ func checkProgressionHandler(w http.ResponseWriter, r *http.Request) {
 	//w.Header().Set("Server","A Fingerprint tracking Go WebServer")
 	w.Header().Set("Content-Type","application/json; charset=utf-8")
 	w.Write(js)
+
+	//We unlock the mutex
+	lock.RUnlock()
 }
 
 func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
