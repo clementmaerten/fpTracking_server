@@ -146,12 +146,13 @@ func launchTrackingAlgorithm(number int, minNbPerUser int, goroutineNumber int,
 	//log.Println("Progress information :",progressInformationSession[userId])
 }
 
-func checkAndDeleteOldSessions() {
+//Delete userId previous session + all old sessions
+func checkAndDeleteOldSessions(id string) {
 
 	lock.Lock()
 	for userId, progressInfo := range progressInformationSession {
 		//We delete a session if it was created more than one day ago
-		if time.Since(progressInfo.CreationDate).Hours() >= float64(24) {
+		if time.Since(progressInfo.CreationDate).Hours() >= float64(24) || userId == id {
 			log.Println("userId",userId,"was deleted in the progressInformationSession map")
 			delete(progressInformationSession,userId)
 		}

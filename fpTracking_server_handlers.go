@@ -102,9 +102,6 @@ func checkProgressionHandler(w http.ResponseWriter, r *http.Request) {
 
 func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 
-	//We look for old sessions and we delete them
-	checkAndDeleteOldSessions()
-
 	//We check if the user has a cookie with a userId
 	session, _ := store.Get(r, "fpTracking-cookie")
 	if session.IsNew {
@@ -112,6 +109,10 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userId := session.Values["userId"].(string)
+
+	//We look for old sessions and we delete them
+	checkAndDeleteOldSessions(userId)
 
 	//Parse the parameters in a map
 	r.ParseForm()
@@ -156,7 +157,7 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 
 
 	go launchTrackingAlgorithm(number, minNbPerUser, goroutineNumber,
-		train, visitFrequencies, session.Values["userId"].(string))
+		train, visitFrequencies, userId)
 
 	w.Header().Set("Content-Type","text/plain; charset=utf-8")
 
