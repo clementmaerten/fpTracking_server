@@ -102,6 +102,8 @@ func checkProgressionHandler(w http.ResponseWriter, r *http.Request) {
 
 func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 
+	//We look for old sessions and we delete them
+	checkAndDeleteOldSessions()
 
 	//We check if the user has a cookie with a userId
 	session, _ := store.Get(r, "fpTracking-cookie")

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"fmt"
+	"time"
 	"strings"
 	"github.com/satori/go.uuid"
 	"github.com/clementmaerten/fpTracking"
@@ -11,6 +12,7 @@ import (
 
 
 type progressInformationStruct struct {
+	CreationDate time.Time
 	Progression int
 	Results []fpTracking.ResultsForVisitFrequency
 }
@@ -26,8 +28,9 @@ func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []i
 
 	//We lock the mutex in order to have a clean write access to progressInformationSession
 	lock.Lock()
+	//We instanciate the session for the user
 	if progressInformationSession[userId] == nil {
-		progressInformationSession[userId] = &progressInformationStruct{}
+		progressInformationSession[userId] = &progressInformationStruct{CreationDate : time.Now()}
 	}
 	lock.Unlock()
 	
@@ -141,4 +144,17 @@ func launchTrackingAlgorithm(number int, minNbPerUser int, goroutineNumber int,
 	//log.Println("TrackingAlgorithm finished !")
 	//log.Println("userId :",userId)
 	//log.Println("Progress information :",progressInformationSession[userId])
+}
+
+func checkAndDeleteOldSessions() {
+
+	lock.Lock()
+	for userId, progressInfo := range progressInformationSession {
+		//We delete a session if it was created more than one day ago
+		if time.Since(progressInfo.CreationDate).Hours() >= float64(24) {
+			log.Println("userId",userId,"was deleted in the progressInformationSession map")
+			delete(progressInformationSession,userId)
+		}
+	}
+	lock.Unlock()
 }
