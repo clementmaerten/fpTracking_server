@@ -36,8 +36,14 @@ $('#fpTrackingParallelForm').submit(() => {
 				//clear the error alerts
 				deleteErrorMessage('fpTrackingParallelResultsErrorAlertId');
 
-				//Begin the check of progression every second
-				checkIntervalId = setInterval(checkProgression,1000);
+				//hide the form
+				$('#fpTrackingParallelForm').hide();
+
+				//show the results div
+				$('#fpTrackingParallelResultsId').show();
+
+				//Begin the check of progression every 5 seconds
+				checkIntervalId = setInterval(checkProgression,5000);
 			},
 			error: () => {
 				triggerErrorMessage('fpTrackingParallelResultsErrorAlertId','The server wasn\'t able to process the request');
@@ -49,17 +55,29 @@ $('#fpTrackingParallelForm').submit(() => {
 	return false;
 });
 
-function checkProgression (){
+function checkProgression() {
 	$.ajax({
 		url: 'check-progression',
 		type: 'POST',
 		success: (data) => {
+
+			updateProgressBar(data.Progression);
+
 			if (data.Progression >= 100) {
 				clearInterval(checkIntervalId);
+				stopProgressBar();
 			}
 		},
 		error: () => {
 			//alert("Error in checkProgression");
 		}
 	});
+}
+
+function updateProgressBar(progression) {
+	$('#progressBarId').attr('aria-valuenow',progression).css('width',progression+'%').html(progression+'%');
+}
+
+function stopProgressBar() {
+	$('#progressBarId').removeClass('progress-bar-animated').removeClass('progress-bar-striped');
 }
