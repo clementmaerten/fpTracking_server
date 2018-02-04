@@ -63,9 +63,6 @@ func testPostHandler(w http.ResponseWriter, r *http.Request) {
 
 func checkProgressionHandler(w http.ResponseWriter, r *http.Request) {
 
-	//We lock the mutex in order to have a clean read and write access to progressInformationSession
-	lock.Lock()
-
 	//We check if the user has a cookie with a userId
 	session, _ := store.Get(r, "fpTracking-cookie")
 	if session.IsNew {
@@ -75,14 +72,19 @@ func checkProgressionHandler(w http.ResponseWriter, r *http.Request) {
 
 	userId := session.Values["userId"].(string)
 
+	//We lock the mutex in order to have a clean read and write access to progressInformationSession
+	lock.Lock()
+
 	//We check if the tracking algorithm has begun
 	if _, is_present := progressInformationSession[userId]; !is_present {
+		lock.Unlock()
 		http.Error(w, "The tracking algorithm wasn't launched", http.StatusForbidden)
 		return
 	}
 
 	js, err := json.Marshal(progressInformationSession[userId])
 	if err != nil {
+		lock.Unlock()
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -92,12 +94,12 @@ func checkProgressionHandler(w http.ResponseWriter, r *http.Request) {
 		progressInformationSession[userId].Results = []fpTracking.ResultsForVisitFrequency{}
 	}
 
+	//We unlock the mutex
+	lock.Unlock()
+
 	//w.Header().Set("Server","A Fingerprint tracking Go WebServer")
 	w.Header().Set("Content-Type","application/json; charset=utf-8")
 	w.Write(js)
-
-	//We unlock the mutex
-	lock.Unlock()
 }
 
 func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
