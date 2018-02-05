@@ -44,6 +44,9 @@ $('#fpTrackingParallelForm').submit(() => {
 
 				//Begin the check of progression every 5 seconds
 				checkIntervalId = setInterval(checkProgression,5000);
+
+				//Display the graphics
+				displayGraphics();
 			},
 			error: () => {
 				triggerErrorMessage('fpTrackingParallelResultsErrorAlertId','The server wasn\'t able to process the request');
@@ -63,6 +66,8 @@ function checkProgression() {
 
 			updateProgressBar(data.Progression);
 
+			//updateAllGraphics();
+
 			if (data.Progression >= 100) {
 				clearInterval(checkIntervalId);
 				stopProgressBar();
@@ -74,10 +79,250 @@ function checkProgression() {
 	});
 }
 
+
+//PROGRESS BAR
 function updateProgressBar(progression) {
 	$('#progressBarId').attr('aria-valuenow',progression).css('width',progression+'%').html(progression+'%');
 }
 
 function stopProgressBar() {
 	$('#progressBarId').removeClass('progress-bar-animated').removeClass('progress-bar-striped');
+}
+
+
+//GRAPHICS
+var rawDaysFrequencyGraph;
+var rawMaxDaysFrequencyGraph;
+var nbIdsFrequencyGraph;
+var ownershipFrequencyGraph;
+var myData = [43934, 52503, 57177, 69658, 97031, 119931, 137133, 154175];
+
+function displayGraphics() {
+	rawDaysFrequencyGraph = Highcharts.chart('rawDaysFrequencyGraphId', {
+
+	    title: {
+	        text: 'Days Frequency graph'
+	    },
+
+	    yAxis: {
+	        title: {
+	            text: 'Average tracking time (days)'
+	        }
+	    },
+
+	    xAxis: {
+	        title: {
+	            text: 'Collect frequency (days)'
+	        }
+	    },
+
+	    legend: {
+	        layout: 'vertical',
+	        align: 'right',
+	        verticalAlign: 'middle'
+	    },
+
+	    plotOptions: {
+	        series: {
+	            label: {
+	                connectorAllowed: false
+	            },
+	            pointStart: 0
+	        }
+	    },
+
+	    series: [{
+	        name: 'Rule-based',
+	        data: myData
+	    }],
+
+	    responsive: {
+	        rules: [{
+	            condition: {
+	                maxWidth: 500
+	            },
+	            chartOptions: {
+	                legend: {
+	                    layout: 'horizontal',
+	                    align: 'center',
+	                    verticalAlign: 'bottom'
+	                }
+	            }
+	        }]
+	    }
+
+	});
+
+	rawMaxDaysFrequencyGraph = Highcharts.chart('rawMaxDaysFrequencyGraphId', {
+
+	    title: {
+	        text: 'Max Days Frequency graph'
+	    },
+
+	    yAxis: {
+	        title: {
+	            text: 'Average maximum tracking time (days)'
+	        }
+	    },
+
+	    xAxis: {
+	        title: {
+	            text: 'Collect frequency (days)'
+	        }
+	    },
+
+	    legend: {
+	        layout: 'vertical',
+	        align: 'right',
+	        verticalAlign: 'middle'
+	    },
+
+	    plotOptions: {
+	        series: {
+	            label: {
+	                connectorAllowed: false
+	            },
+	            pointStart: 0
+	        }
+	    },
+
+	    series: [{
+	        name: 'Rule-based',
+	        data: myData
+	    }],
+
+	    responsive: {
+	        rules: [{
+	            condition: {
+	                maxWidth: 500
+	            },
+	            chartOptions: {
+	                legend: {
+	                    layout: 'horizontal',
+	                    align: 'center',
+	                    verticalAlign: 'bottom'
+	                }
+	            }
+	        }]
+	    }
+
+	});
+
+	nbIdsFrequencyGraph = Highcharts.chart('nbIdsFrequencyGraphId', {
+
+	    title: {
+	        text: 'Number of ids Frequency graph'
+	    },
+
+	    yAxis: {
+	        title: {
+	            text: 'Number of ids per user'
+	        }
+	    },
+
+	    xAxis: {
+	        title: {
+	            text: 'Collect frequency (days)'
+	        }
+	    },
+
+	    legend: {
+	        layout: 'vertical',
+	        align: 'right',
+	        verticalAlign: 'middle'
+	    },
+
+	    plotOptions: {
+	        series: {
+	            label: {
+	                connectorAllowed: false
+	            },
+	            pointStart: 0
+	        }
+	    },
+
+	    series: [{
+	        name: 'Rule-based',
+	        data: myData
+	    }],
+
+	    responsive: {
+	        rules: [{
+	            condition: {
+	                maxWidth: 500
+	            },
+	            chartOptions: {
+	                legend: {
+	                    layout: 'horizontal',
+	                    align: 'center',
+	                    verticalAlign: 'bottom'
+	                }
+	            }
+	        }]
+	    }
+
+	});
+
+	ownershipFrequencyGraph = Highcharts.chart('ownershipFrequencyGraphId', {
+
+	    title: {
+	        text: 'Ownership Frequency graph'
+	    },
+
+	    yAxis: {
+	        title: {
+	            text: 'Average ownership'
+	        }
+	    },
+
+	    xAxis: {
+	        title: {
+	            text: 'Collect frequency (days)'
+	        }
+	    },
+
+	    legend: {
+	        layout: 'vertical',
+	        align: 'right',
+	        verticalAlign: 'middle'
+	    },
+
+	    plotOptions: {
+	        series: {
+	            label: {
+	                connectorAllowed: false
+	            },
+	            pointStart: 0
+	        }
+	    },
+
+	    series: [{
+	        name: 'Rule-based',
+	        data: myData
+	    }],
+
+	    responsive: {
+	        rules: [{
+	            condition: {
+	                maxWidth: 500
+	            },
+	            chartOptions: {
+	                legend: {
+	                    layout: 'horizontal',
+	                    align: 'center',
+	                    verticalAlign: 'bottom'
+	                }
+	            }
+	        }]
+	    }
+
+	});
+}
+
+function updateAllGraphics() {
+	myData[1] += 80000;
+	myData[5] += 10000;
+	//myData[8] += 10000;
+	rawDaysFrequencyGraph.series[0].setData(myData,false);
+	//rawDaysFrequencyGraph.series[0].data[5].update(test);
 }
