@@ -71,6 +71,7 @@ function checkProgression() {
 			if (data.Progression >= 100) {
 				clearInterval(checkIntervalId);
 				stopProgressBar();
+				displayBackButton();
 			}
 		},
 		error: () => {
@@ -79,6 +80,20 @@ function checkProgression() {
 	});
 }
 
+//BACK BUTTON
+function displayBackButton() {
+	$('#backButtonDivId').show();
+}
+
+$('#backButtonDivId').click(() => {
+	resetProgressBar();
+	resetGraphics();
+
+	$('#backButtonDivId').hide();
+	$('#fpTrackingParallelResultsId').hide();
+
+	$('#fpTrackingParallelForm').show();
+});
 
 //PROGRESS BAR
 function updateProgressBar(progression) {
@@ -87,6 +102,11 @@ function updateProgressBar(progression) {
 
 function stopProgressBar() {
 	$('#progressBarId').removeClass('progress-bar-animated').removeClass('progress-bar-striped');
+}
+
+function resetProgressBar() {
+	$('#progressBarId').attr('aria-valuenow','0').css('width','0%').html('0%');
+	$('#progressBarId').addClass('progress-bar-animated').addClass('progress-bar-striped');
 }
 
 
@@ -266,4 +286,13 @@ function updateAllGraphics(data) {
 			data.OwnershipFrequencyGraph[i].Value
 		]);
 	}
+}
+
+function resetGraphics() {
+	rawAndRawMaxDaysFrequencyGraph.series[0].data = [];
+	rawAndRawMaxDaysFrequencyGraph.series[1].data = [];
+
+	nbIdsFrequencyGraph.series[0].data = [];
+
+	ownershipFrequencyGraph.series[0].data = [];
 }
