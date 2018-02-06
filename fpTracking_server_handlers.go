@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"path"
 	"html/template"
-	"github.com/clementmaerten/fpTracking"
+	//"github.com/clementmaerten/fpTracking"
 	"github.com/gorilla/sessions"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -90,9 +90,9 @@ func checkProgressionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//We delete the results in the map in order to not send them more than once
-	if len(progressInformationSession[userId].Results) >= 1 {
+	/*if len(progressInformationSession[userId].Results) >= 1 {
 		progressInformationSession[userId].Results = []fpTracking.ResultsForVisitFrequency{}
-	}
+	}*/
 
 	//We unlock the mutex
 	lock.Unlock()

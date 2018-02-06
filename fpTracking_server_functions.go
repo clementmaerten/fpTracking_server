@@ -9,12 +9,13 @@ import (
 	"github.com/clementmaerten/fpTracking"
 )
 
-
-
 type progressInformationStruct struct {
 	CreationDate time.Time
 	Progression int
-	Results []fpTracking.ResultsForVisitFrequency
+	AverageTrackingTimeGraph []fpTracking.GraphicPoint
+	MaximumAverageTrackingTimeGraph []fpTracking.GraphicPoint
+	NbIdsFrequencyGraph []fpTracking.GraphicPoint
+	OwnershipFrequencyGraph []fpTracking.GraphicPoint
 }
 
 //This function listen to the progress channel and update the user's session with progress information
@@ -53,11 +54,18 @@ func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []i
 			progressInformationSession[userId].Progression = globalProgression
 			lock.Unlock()
 
-		} else if strings.Compare(rq.Task, fpTracking.SEND_RESULTS_FOR_VISIT_FREQUENCY) == 0 {
+		} else if strings.Compare(rq.Task, fpTracking.SEND_NEW_COMPUTED_POINTS) == 0 {
 
 			//We lock the mutex in order to have a clean write access to progressInformationSession
 			lock.Lock()
-			progressInformationSession[userId].Results = append(progressInformationSession[userId].Results, rq.ResForVisitFreq)
+			progressInformationSession[userId].AverageTrackingTimeGraph = append(progressInformationSession[userId].AverageTrackingTimeGraph,
+				rq.GraphPoints["averageTrackingTime"])
+			progressInformationSession[userId].MaximumAverageTrackingTimeGraph = append(progressInformationSession[userId].MaximumAverageTrackingTimeGraph,
+				rq.GraphPoints["maximumAverageTrackingTime"])
+			progressInformationSession[userId].NbIdsFrequencyGraph = append(progressInformationSession[userId].NbIdsFrequencyGraph,
+				rq.GraphPoints["nbIdsFrequency"])
+			progressInformationSession[userId].OwnershipFrequencyGraph = append(progressInformationSession[userId].OwnershipFrequencyGraph,
+				rq.GraphPoints["ownershipFrequency"])
 			lock.Unlock()
 		} else if strings.Compare(rq.Task, fpTracking.CLOSE_GOROUTINE) == 0 {
 
@@ -122,28 +130,14 @@ func launchTrackingAlgorithm(number int, minNbPerUser int, goroutineNumber int,
 			visitFrequency, fpTracking.RuleBasedLinkingParallel, goroutineNumber,
 			visitFrequencyToReplaySequence[visitFrequency], progressChannel)
 
-		log.Println("We send the results for visitFrequency",visitFrequency)
+		log.Println("We compute the results for visitFrequency",visitFrequency)
 		progressChannel <- fpTracking.ProgressMessage {
-			Task : fpTracking.SEND_RESULTS_FOR_VISIT_FREQUENCY,
-			ResForVisitFreq : fpTracking.AnalyseScenarioResultInJSON(visitFrequency, scenarioResult, test),
+			Task : fpTracking.SEND_NEW_COMPUTED_POINTS,
+			GraphPoints : computeGraphicsPoints(fpTracking.AnalyseScenarioResultInStruct(visitFrequency, scenarioResult, test)),
 		}
 	}
 
 	progressChannel <- fpTracking.ProgressMessage{Task : fpTracking.CLOSE_GOROUTINE}
-
-	/*js, err := json.Marshal(jsonResults)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	//w.Header().Set("Server","A Fingerprint tracking Go WebServer")
-	w.Header().Set("Content-Type","application/json; charset=utf-8")
-	w.Write(js)*/
-
-	//log.Println("TrackingAlgorithm finished !")
-	//log.Println("userId :",userId)
-	//log.Println("Progress information :",progressInformationSession[userId])
 }
 
 //Delete userId previous session + all old sessions
@@ -158,4 +152,52 @@ func checkAndDeleteOldSessions(id string) {
 		}
 	}
 	lock.Unlock()
+}
+
+func computeGraphicsPoints(results fpTracking.ResultsForVisitFrequency) map[string]fpTracking.GraphicPoint {
+
+	var nbRawDays []float64
+	var maxChainRatio []float64
+
+	nbAssignedIdsMean := 0.0
+
+	for _, res1 := range results.Res1 {
+		//we recompute ratio so that the first fingerprint of each assigned id is not counted
+		res1.Ratio = float64((res1.NbOriginalFp - res1.NbAssignedIds)/res1.NbAssignedIds)
+
+		nbRawDays = append(nbRawDays, res1.Ratio * float64(results.VisitFrequency))
+		maxChainRatio = append(maxChainRatio, float64((res1.MaxChain - 1)*results.VisitFrequency))
+
+		nbAssignedIdsMean += float64(res1.NbAssignedIds)
+	}
+
+	maxChainRatioMean := getMeanFromFloatSlice(maxChainRatio)
+	nbRawDaysMean := getMeanFromFloatSlice(nbRawDays)
+
+	nbAssignedIdsMean /= float64(len(results.Res1))
+
+	ownershipMean := 0.0
+	for _, res2 := range results.Res2 {
+		ownershipMean += res2.Ownership
+	}
+	ownershipMean /= float64(len(results.Res2))
+
+
+	m := make(map[string]fpTracking.GraphicPoint)
+	m["averageTrackingTime"] = fpTracking.GraphicPoint{VisitFrequency : results.VisitFrequency, Value : nbRawDaysMean}
+	m["maximumAverageTrackingTime"] = fpTracking.GraphicPoint{VisitFrequency : results.VisitFrequency, Value : maxChainRatioMean}
+	m["nbIdsFrequency"] = fpTracking.GraphicPoint{VisitFrequency : results.VisitFrequency, Value : nbAssignedIdsMean}
+	m["ownershipFrequency"] = fpTracking.GraphicPoint{VisitFrequency : results.VisitFrequency, Value : ownershipMean}
+
+	return m
+}
+
+func getMeanFromFloatSlice(floatSlice []float64) float64 {
+	mean := 0.0
+
+	for _, fl := range floatSlice {
+		mean += fl
+	}
+
+	return (mean / float64(len(floatSlice)))
 }
