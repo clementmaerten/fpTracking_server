@@ -66,7 +66,7 @@ function checkProgression() {
 
 			updateProgressBar(data.Progression);
 
-			//updateAllGraphics();
+			updateAllGraphics(data);
 
 			if (data.Progression >= 100) {
 				clearInterval(checkIntervalId);
@@ -94,8 +94,6 @@ function stopProgressBar() {
 var rawAndRawMaxDaysFrequencyGraph;
 var nbIdsFrequencyGraph;
 var ownershipFrequencyGraph;
-var myData = [43934, 52503, 57177, 69658, 97031, 119931, 137133, 154175];
-var myData2 = [154175, 137133, 119931, 97031, 69658, 57177, 52503, 43934];
 
 function displayGraphics() {
 	rawAndRawMaxDaysFrequencyGraph = Highcharts.chart('rawAndRawMaxDaysFrequencyGraphId', {
@@ -127,10 +125,10 @@ function displayGraphics() {
 
 	    series: [{
 	        name: 'Average',
-	        data: myData
+	        data: []
 	    }, {
 	    	name: 'Maximum average',
-	    	data: myData2
+	    	data: []
 	    }],
 
 	    responsive: {
@@ -179,7 +177,7 @@ function displayGraphics() {
 
 	    series: [{
 	        name: 'Rule-based',
-	        data: myData
+	        data: []
 	    }],
 
 	    responsive: {
@@ -228,7 +226,7 @@ function displayGraphics() {
 
 	    series: [{
 	        name: 'Rule-based',
-	        data: myData
+	        data: []
 	    }],
 
 	    responsive: {
@@ -249,10 +247,23 @@ function displayGraphics() {
 	});
 }
 
-function updateAllGraphics() {
-	myData[1] += 80000;
-	myData[5] += 10000;
-	//myData[8] += 10000;
-	rawDaysFrequencyGraph.series[0].setData(myData,false);
-	//rawDaysFrequencyGraph.series[0].data[5].update(test);
+function updateAllGraphics(data) {
+	for (let i = 0; i < data.AverageTrackingTimeGraph.length; i++) {
+		rawAndRawMaxDaysFrequencyGraph.series[0].addPoint([
+			data.AverageTrackingTimeGraph[i].VisitFrequency,
+			data.AverageTrackingTimeGraph[i].Value
+		]);
+		rawAndRawMaxDaysFrequencyGraph.series[1].addPoint([
+			data.MaximumAverageTrackingTimeGraph[i].VisitFrequency,
+			data.MaximumAverageTrackingTimeGraph[i].Value
+		]);
+		nbIdsFrequencyGraph.series[0].addPoint([
+			data.NbIdsFrequencyGraph[i].VisitFrequency,
+			data.NbIdsFrequencyGraph[i].Value
+		]);
+		ownershipFrequencyGraph.series[0].addPoint([
+			data.OwnershipFrequencyGraph[i].VisitFrequency,
+			data.OwnershipFrequencyGraph[i].Value
+		]);
+	}
 }

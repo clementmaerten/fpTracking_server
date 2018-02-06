@@ -31,7 +31,13 @@ func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []i
 	lock.Lock()
 	//We instanciate the session for the user
 	if progressInformationSession[userId] == nil {
-		progressInformationSession[userId] = &progressInformationStruct{CreationDate : time.Now()}
+		progressInformationSession[userId] = &progressInformationStruct{
+			CreationDate : time.Now(),
+			AverageTrackingTimeGraph : []fpTracking.GraphicPoint{},
+			MaximumAverageTrackingTimeGraph : []fpTracking.GraphicPoint{},
+			NbIdsFrequencyGraph : []fpTracking.GraphicPoint{},
+			OwnershipFrequencyGraph : []fpTracking.GraphicPoint{},
+		}
 	}
 	lock.Unlock()
 	
