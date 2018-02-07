@@ -10,7 +10,8 @@ import (
 )
 
 type progressInformationStruct struct {
-	CreationDate time.Time
+	creationDate time.Time
+	inProgress bool
 	Progression int
 	AverageTrackingTimeGraph []fpTracking.GraphicPoint
 	MaximumAverageTrackingTimeGraph []fpTracking.GraphicPoint
@@ -26,20 +27,6 @@ func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []i
 	currentVisitFrequency := sortedVisitFrequencies[0]
 	indexAtNewVisitFrequency := 0
 	globalProgression := 0
-
-	//We lock the mutex in order to have a clean write access to progressInformationSession
-	lock.Lock()
-	//We instanciate the session for the user
-	if progressInformationSession[userId] == nil {
-		progressInformationSession[userId] = &progressInformationStruct{
-			CreationDate : time.Now(),
-			AverageTrackingTimeGraph : []fpTracking.GraphicPoint{},
-			MaximumAverageTrackingTimeGraph : []fpTracking.GraphicPoint{},
-			NbIdsFrequencyGraph : []fpTracking.GraphicPoint{},
-			OwnershipFrequencyGraph : []fpTracking.GraphicPoint{},
-		}
-	}
-	lock.Unlock()
 	
 	for {
 		rq := <- ch
@@ -79,6 +66,7 @@ func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []i
 			//We lock the mutex in order to have a clean write access to progressInformationSession
 			lock.Lock()
 			progressInformationSession[userId].Progression = globalProgression
+			progressInformationSession[userId].inProgress = false
 			lock.Unlock()
 
 			close(ch)
@@ -99,6 +87,7 @@ func generateNewId() string {
 func launchTrackingAlgorithm(number int, minNbPerUser int, goroutineNumber int,
 		train float64, visitFrequencies []int, userId string) {
 
+	//We do the request in the SQL database
 	fingerprintManager := fpTracking.FingerprintManager{
 		Number: number,
 		Train:  train,
@@ -147,13 +136,24 @@ func launchTrackingAlgorithm(number int, minNbPerUser int, goroutineNumber int,
 	progressChannel <- fpTracking.ProgressMessage{Task : fpTracking.CLOSE_GOROUTINE}
 }
 
+//Returns whether the tracking alorithm is currently running or not for the user in argument
+func isCurrentlyRunningForUser(id string) bool {
+	//We only need a read access to the global variable progressInformationSession
+	lock.RLock()
+	value, is_present := progressInformationSession[id]
+	result := is_present && value.inProgress
+	lock.RUnlock()
+
+	return result
+}
+
 //Delete userId previous session + all old sessions
 func checkAndDeleteOldSessions(id string) {
 
 	lock.Lock()
 	for userId, progressInfo := range progressInformationSession {
 		//We delete a session if it was created more than one day ago
-		if time.Since(progressInfo.CreationDate).Hours() >= float64(24) || userId == id {
+		if time.Since(progressInfo.creationDate).Hours() >= float64(24) || userId == id {
 			log.Println("userId",userId,"was deleted in the progressInformationSession map")
 			delete(progressInformationSession,userId)
 		}

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
+	"time"
 	"encoding/json"
 	"path"
 	"html/template"
@@ -116,6 +117,13 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 
 	userId := session.Values["userId"].(string)
 
+	//We look if the algorithm is currently running for the same user
+	//If it's running, we won't launch it a second time until the first one is finished
+	if isCurrentlyRunningForUser(userId) {
+		http.Error(w, "The algorithm is already running for you", http.StatusForbidden)
+		return
+	}
+
 	//We look for old sessions and we delete them
 	checkAndDeleteOldSessions(userId)
 
@@ -159,6 +167,21 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 
 	//Sort the visitFrequencies
 	sort.Ints(visitFrequencies)
+
+	//We lock the mutex in order to have a clean write access to progressInformationSession
+	lock.Lock()
+	//We instanciate the session for the user
+	if progressInformationSession[userId] == nil {
+		progressInformationSession[userId] = &progressInformationStruct{
+			creationDate : time.Now(),
+			inProgress : true,
+			AverageTrackingTimeGraph : []fpTracking.GraphicPoint{},
+			MaximumAverageTrackingTimeGraph : []fpTracking.GraphicPoint{},
+			NbIdsFrequencyGraph : []fpTracking.GraphicPoint{},
+			OwnershipFrequencyGraph : []fpTracking.GraphicPoint{},
+		}
+	}
+	lock.Unlock()
 
 
 	go launchTrackingAlgorithm(number, minNbPerUser, goroutineNumber,
