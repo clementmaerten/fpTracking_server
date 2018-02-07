@@ -13,6 +13,7 @@ type progressInformationStruct struct {
 	creationDate time.Time
 	inProgress bool
 	Progression int
+	CurrentVisitFrequency int
 	AverageTrackingTimeGraph []fpTracking.GraphicPoint
 	MaximumAverageTrackingTimeGraph []fpTracking.GraphicPoint
 	NbIdsFrequencyGraph []fpTracking.GraphicPoint
@@ -32,10 +33,13 @@ func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []i
 		rq := <- ch
 		if strings.Compare(rq.Task, fpTracking.SEND_PROGRESS_INFORMATION) == 0 {
 
+			isVisitFrequencyChanged := false
+
 			if rq.VisitFrequency != currentVisitFrequency {
 				indexAtNewVisitFrequency += lengths[currentVisitFrequency]
 				currentVisitFrequency = rq.VisitFrequency
 				log.Println("new visitFrequency :",currentVisitFrequency)
+				isVisitFrequencyChanged = true
 			}
 
 			globalProgression = (indexAtNewVisitFrequency + rq.Index) * 100 / totalLength
@@ -45,6 +49,9 @@ func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []i
 			//We lock the mutex in order to have a clean write access to progressInformationSession
 			lock.Lock()
 			progressInformationSession[userId].Progression = globalProgression
+			if isVisitFrequencyChanged {
+				progressInformationSession[userId].CurrentVisitFrequency = currentVisitFrequency
+			}
 			lock.Unlock()
 
 		} else if strings.Compare(rq.Task, fpTracking.SEND_NEW_COMPUTED_POINTS) == 0 {

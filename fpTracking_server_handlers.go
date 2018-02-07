@@ -176,6 +176,7 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 			creationDate : time.Now(),
 			inProgress : true,
 			Progression : 0,
+			CurrentVisitFrequency : visitFrequencies[0],
 			AverageTrackingTimeGraph : []fpTracking.GraphicPoint{},
 			MaximumAverageTrackingTimeGraph : []fpTracking.GraphicPoint{},
 			NbIdsFrequencyGraph : []fpTracking.GraphicPoint{},

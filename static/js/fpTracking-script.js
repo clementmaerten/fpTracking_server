@@ -64,12 +64,15 @@ function checkProgression() {
 		type: 'POST',
 		success: (data) => {
 
+			updateProgressMessage(data.CurrentVisitFrequency);
+
 			updateProgressBar(data.Progression);
 
 			updateAllGraphics(data);
 
 			if (data.Progression >= 100) {
 				clearInterval(checkIntervalId);
+				deleteProgressMessage();
 				stopProgressBar();
 				displayBackButton();
 			}
@@ -94,6 +97,15 @@ $('#backButtonDivId').click(() => {
 
 	$('#fpTrackingParallelForm').show();
 });
+
+//PROGRESS MESSAGE
+function updateProgressMessage(currentVisitFrequency) {
+	$('#progressMessageId').html('Computing visit frequency '+currentVisitFrequency+' ...');
+}
+
+function deleteProgressMessage() {
+	$('#progressMessageId').html('');
+}
 
 //PROGRESS BAR
 function updateProgressBar(progression) {
