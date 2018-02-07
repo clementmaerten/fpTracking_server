@@ -175,6 +175,7 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 		progressInformationSession[userId] = &progressInformationStruct{
 			creationDate : time.Now(),
 			inProgress : true,
+			Progression : 0,
 			AverageTrackingTimeGraph : []fpTracking.GraphicPoint{},
 			MaximumAverageTrackingTimeGraph : []fpTracking.GraphicPoint{},
 			NbIdsFrequencyGraph : []fpTracking.GraphicPoint{},
