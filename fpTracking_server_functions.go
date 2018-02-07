@@ -21,7 +21,7 @@ type progressInformationStruct struct {
 //This function listen to the progress channel and update the user's session with progress information
 //This function is supposed to be executed by a goroutine
 func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []int, lengths map[int]int,
-	userId string, ch <- chan fpTracking.ProgressMessage) {
+	userId string, ch chan fpTracking.ProgressMessage) {
 
 	currentVisitFrequency := sortedVisitFrequencies[0]
 	indexAtNewVisitFrequency := 0
@@ -80,6 +80,8 @@ func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []i
 			lock.Lock()
 			progressInformationSession[userId].Progression = globalProgression
 			lock.Unlock()
+
+			close(ch)
 			return
 		} else {
 			//This case should never happen
@@ -126,7 +128,6 @@ func launchTrackingAlgorithm(number int, minNbPerUser int, goroutineNumber int,
 
 	//We create the channel and we lauch the goroutine which is going to listen to the messages
 	progressChannel := make(chan fpTracking.ProgressMessage, 100)
-	defer close(progressChannel)
 	go listenFpTrackingProgressChannel(totalLength, visitFrequencies, lengths,
 		userId, progressChannel)
 
