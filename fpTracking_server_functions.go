@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"fmt"
+	"math"
 	"time"
 	"strings"
 	"github.com/satori/go.uuid"
@@ -198,10 +199,10 @@ func computeGraphicsPoints(results fpTracking.ResultsForVisitFrequency) map[stri
 
 
 	m := make(map[string]fpTracking.GraphicPoint)
-	m["averageTrackingTime"] = fpTracking.GraphicPoint{VisitFrequency : results.VisitFrequency, Value : nbRawDaysMean}
-	m["maximumAverageTrackingTime"] = fpTracking.GraphicPoint{VisitFrequency : results.VisitFrequency, Value : maxChainRatioMean}
-	m["nbIdsFrequency"] = fpTracking.GraphicPoint{VisitFrequency : results.VisitFrequency, Value : nbAssignedIdsMean}
-	m["ownershipFrequency"] = fpTracking.GraphicPoint{VisitFrequency : results.VisitFrequency, Value : ownershipMean}
+	m["averageTrackingTime"] = fpTracking.GraphicPoint{VisitFrequency : results.VisitFrequency, Value : roundPlus(nbRawDaysMean,4)}
+	m["maximumAverageTrackingTime"] = fpTracking.GraphicPoint{VisitFrequency : results.VisitFrequency, Value : roundPlus(maxChainRatioMean,4)}
+	m["nbIdsFrequency"] = fpTracking.GraphicPoint{VisitFrequency : results.VisitFrequency, Value : roundPlus(nbAssignedIdsMean,4)}
+	m["ownershipFrequency"] = fpTracking.GraphicPoint{VisitFrequency : results.VisitFrequency, Value : roundPlus(ownershipMean,4)}
 
 	return m
 }
@@ -214,4 +215,13 @@ func getMeanFromFloatSlice(floatSlice []float64) float64 {
 	}
 
 	return (mean / float64(len(floatSlice)))
+}
+
+func round(f float64) float64 {
+    return math.Floor(f + .5)
+}
+
+func roundPlus(f float64, places int) (float64) {
+	shift := math.Pow(10, float64(places))
+	return round(f * shift) / shift;
 }
