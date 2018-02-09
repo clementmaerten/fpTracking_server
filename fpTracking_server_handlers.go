@@ -181,6 +181,7 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 			MaximumAverageTrackingTimeGraph : []fpTracking.GraphicPoint{},
 			NbIdsFrequencyGraph : []fpTracking.GraphicPoint{},
 			OwnershipFrequencyGraph : []fpTracking.GraphicPoint{},
+			ExecutingTime : 0,
 		}
 	}
 	lock.Unlock()

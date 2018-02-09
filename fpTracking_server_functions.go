@@ -19,6 +19,7 @@ type progressInformationStruct struct {
 	MaximumAverageTrackingTimeGraph []fpTracking.GraphicPoint
 	NbIdsFrequencyGraph []fpTracking.GraphicPoint
 	OwnershipFrequencyGraph []fpTracking.GraphicPoint
+	ExecutingTime float64
 }
 
 //This function listen to the progress channel and update the user's session with progress information
@@ -75,6 +76,7 @@ func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []i
 			lock.Lock()
 			progressInformationSession[userId].Progression = globalProgression
 			progressInformationSession[userId].inProgress = false
+			progressInformationSession[userId].ExecutingTime = roundPlus(time.Since(progressInformationSession[userId].creationDate).Seconds(),2)
 			lock.Unlock()
 
 			close(ch)

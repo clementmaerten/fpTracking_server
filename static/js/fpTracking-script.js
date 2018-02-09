@@ -72,8 +72,10 @@ function checkProgression() {
 
 			if (data.Progression >= 100) {
 				clearInterval(checkIntervalId);
-				deleteProgressMessage();
 				stopProgressBar();
+				deleteProgressMessage();
+
+				displayExecutingTime(data.ExecutingTime);
 				displayBackButton();
 			}
 		},
@@ -91,6 +93,7 @@ function displayBackButton() {
 $('#backButtonDivId').click(() => {
 	resetProgressBar();
 	resetGraphics();
+	deleteExecutingTime();
 
 	$('#backButtonDivId').hide();
 	$('#fpTrackingParallelResultsId').hide();
@@ -100,11 +103,28 @@ $('#backButtonDivId').click(() => {
 
 //PROGRESS MESSAGE
 function updateProgressMessage(currentVisitFrequency) {
+	$('#progressMessageId').show();
 	$('#progressMessageId').html('Computing visit frequency '+currentVisitFrequency+' ...');
 }
 
 function deleteProgressMessage() {
+	$('#progressMessageId').hide();
 	$('#progressMessageId').html('');
+}
+
+//EXECUTING TIME
+function displayExecutingTime(executingTime) {
+	$('#ExecutingTimeId').show();
+	if (executingTime <= 1) {
+		$('#ExecutingTimeId').html('Executed in '+executingTime+' second');
+	} else {
+		$('#ExecutingTimeId').html('Executed in '+executingTime+' seconds');
+	}
+}
+
+function deleteExecutingTime() {
+	$('#ExecutingTimeId').hide();
+	$('#ExecutingTimeId').html('');
 }
 
 //PROGRESS BAR
