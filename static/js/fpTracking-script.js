@@ -156,9 +156,11 @@ function displayGraphics() {
 	    },
 
 	    series: [{
+	    	showInLegend: false,
 	        name: 'Average',
 	        data: []
 	    }, {
+	    	showInLegend: false,
 	    	name: 'Maximum average',
 	    	data: []
 	    }],
@@ -208,6 +210,7 @@ function displayGraphics() {
 	    },
 
 	    series: [{
+	    	showInLegend: false,
 	        name: 'Rule-based',
 	        data: []
 	    }],
@@ -257,6 +260,7 @@ function displayGraphics() {
 	    },
 
 	    series: [{
+	    	showInLegend: false,
 	        name: 'Rule-based',
 	        data: []
 	    }],
