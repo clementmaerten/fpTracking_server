@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"encoding/json"
+	"github.com/clementmaerten/fpTracking"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 )
@@ -20,6 +22,7 @@ const TEMPLATES_FOLDER = "templates"
 //Global variables
 var progressInformationSession map[string]*progressInformationStruct
 var lock = sync.RWMutex{}
+var dbInfos = fpTracking.DBInformation{}
 var (
 	key = []byte("super-secret-key")
 	store = sessions.NewCookieStore(key)
@@ -59,7 +62,19 @@ func main() {
 
 	//Initialization of the global variables
 	progressInformationSession = make(map[string]*progressInformationStruct)
-	log.Println("progressInformationSession :",progressInformationSession)
+	//Read the config.json file
+	confFile, confFileErr := os.Open("conf/conf.json")
+	if confFileErr != nil {
+		log.Fatalln("unable to open the conf file :",confFileErr)
+	}
+	decoder := json.NewDecoder(confFile)
+	confDecodeErr := decoder.Decode(&dbInfos)
+	if confDecodeErr != nil {
+		confFile.Close()
+		log.Fatalln("unable to read the conf file :",confDecodeErr)
+	}
+	confFile.Close()
+
 
 	//Start the server and listen to requests
 	err := srv.ListenAndServe()

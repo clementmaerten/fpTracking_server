@@ -1,0 +1,7 @@
+{
+	"DBType": "mysql",
+	"User": "root",
+	"Password": "mysql",
+	"TCP": "",
+	"DBName": "fingerprint"
+}

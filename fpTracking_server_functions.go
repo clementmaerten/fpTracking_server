@@ -100,13 +100,7 @@ func launchTrackingAlgorithm(number int, minNbPerUser int, goroutineNumber int,
 		Number: number,
 		Train:  train,
 		MinNumberFpPerUser: minNbPerUser,
-		DBInfo: fpTracking.DBInformation {
-			DBType: "mysql",
-			User: "root",
-			Password: "mysql",
-			TCP: "",
-			DBName: "fingerprint",
-		},
+		DBInfo: dbInfos,
 	}
 
 	_, test := fingerprintManager.GetFingerprints()
