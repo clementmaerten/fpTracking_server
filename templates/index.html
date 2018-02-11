@@ -97,12 +97,26 @@
 
 				<div class="graphs">
 					<div class="resultGraph" id="rawAndRawMaxDaysFrequencyGraphId"></div>
+					<p>
+						This graph shows how long, in average, FP-Stalker is able to keep track of a browser instance,
+						for a given visit frequency. The maximum average curve represents an average of the longest
+						tracking durations that were able to be constructed.
+					</p>
+					<br>
 					<div class="row">
 						<div class="col">
 							<div class="resultGraph" id="nbIdsFrequencyGraphId"></div>
+							<p>
+								This graph presents the number of ids the FP-Tracking algorithm assigned for each browser instance
+								(lower is better).
+							</p>
 						</div>
 						<div class="col">
 							<div class="resultGraph" id="ownershipFrequencyGraphId"></div>
+							<p>
+								This graph shows the rate of well placed fingerprints in the tracking chain. A value of 1 means
+								the tracking chain is constructed perfectly.
+							</p>
 						</div>
 					</div>
 				</div>

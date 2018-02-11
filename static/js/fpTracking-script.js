@@ -150,12 +150,12 @@ function displayGraphics() {
 	rawAndRawMaxDaysFrequencyGraph = Highcharts.chart('rawAndRawMaxDaysFrequencyGraphId', {
 
 	    title: {
-	        text: 'Days Frequency graph'
+	        text: 'Average and average maximum tracking duration against collect frequency'
 	    },
 
 	    yAxis: {
 	        title: {
-	            text: 'Average tracking time (days)'
+	            text: 'Tracking duration (days)'
 	        }
 	    },
 
@@ -180,7 +180,7 @@ function displayGraphics() {
 	        data: []
 	    }, {
 	    	showInLegend: false,
-	    	name: 'Maximum average',
+	    	name: 'Average maximum',
 	    	data: []
 	    }],
 
@@ -204,7 +204,7 @@ function displayGraphics() {
 	nbIdsFrequencyGraph = Highcharts.chart('nbIdsFrequencyGraphId', {
 
 	    title: {
-	        text: 'Number of ids Frequency graph'
+	        text: 'Average number of ids per browser instance against collect frequency'
 	    },
 
 	    yAxis: {
@@ -230,7 +230,7 @@ function displayGraphics() {
 
 	    series: [{
 	    	showInLegend: false,
-	        name: 'Rule-based',
+	        name: 'Number of ids per user',
 	        data: []
 	    }],
 
@@ -254,7 +254,7 @@ function displayGraphics() {
 	ownershipFrequencyGraph = Highcharts.chart('ownershipFrequencyGraphId', {
 
 	    title: {
-	        text: 'Ownership Frequency graph'
+	        text: 'Average ownership of tracking chains against collect frequency'
 	    },
 
 	    yAxis: {
@@ -280,7 +280,7 @@ function displayGraphics() {
 
 	    series: [{
 	    	showInLegend: false,
-	        name: 'Rule-based',
+	        name: 'Average ownership',
 	        data: []
 	    }],
 
