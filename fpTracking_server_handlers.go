@@ -54,7 +54,7 @@ func checkProgressionHandler(w http.ResponseWriter, r *http.Request) {
 	//We check if the user has a cookie with a userId
 	session, _ := store.Get(r, "fpTracking-cookie")
 	if session.IsNew {
-		http.Error(w, "Cookie not found", http.StatusForbidden)
+		http.Error(w, "Cookie not found", http.StatusBadRequest)
 		return
 	}
 
@@ -66,7 +66,7 @@ func checkProgressionHandler(w http.ResponseWriter, r *http.Request) {
 	//We check if the tracking algorithm has begun
 	if _, is_present := progressInformationSession[userId]; !is_present {
 		lock.Unlock()
-		http.Error(w, "The tracking algorithm wasn't launched", http.StatusForbidden)
+		http.Error(w, "The tracking algorithm wasn't launched", http.StatusBadRequest)
 		return
 	}
 
@@ -98,7 +98,7 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 	//We check if the user has a cookie with a userId
 	session, _ := store.Get(r, "fpTracking-cookie")
 	if session.IsNew {
-		http.Error(w, "Cookie not found", http.StatusForbidden)
+		http.Error(w, "Cookie not found", http.StatusBadRequest)
 		return
 	}
 
@@ -107,7 +107,7 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 	//We look if the algorithm is currently running for the same user
 	//If it's running, we won't launch it a second time until the first one is finished
 	if isCurrentlyRunningForUser(userId) {
-		http.Error(w, "The algorithm is already running for you", http.StatusForbidden)
+		http.Error(w, "The algorithm is already running for you", http.StatusBadRequest)
 		return
 	}
 
@@ -191,7 +191,7 @@ func stopTrackingHandler(w http.ResponseWriter, r *http.Request) {
 	//We check if the user has a cookie with a userId
 	session, _ := store.Get(r, "fpTracking-cookie")
 	if session.IsNew {
-		http.Error(w, "Cookie not found", http.StatusForbidden)
+		http.Error(w, "Cookie not found", http.StatusBadRequest)
 		return
 	}
 
