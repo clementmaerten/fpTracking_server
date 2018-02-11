@@ -48,8 +48,9 @@ $('#fpTrackingParallelForm').submit(() => {
 				//Display the graphics
 				displayGraphics();
 			},
-			error: () => {
-				triggerErrorMessage('fpTrackingParallelResultsErrorAlertId','The server wasn\'t able to process the request');
+			error: (err) => {
+				triggerErrorMessage('fpTrackingParallelResultsErrorAlertId',
+					'The server wasn\'t able to process the request : '+err.responseText);
 			}
 		});
 	}
@@ -79,9 +80,7 @@ function checkProgression() {
 				displayBackButton();
 			}
 		},
-		error: () => {
-			//alert("Error in checkProgression");
-		}
+		error: () => {}
 	});
 }
 
