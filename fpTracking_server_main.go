@@ -38,6 +38,7 @@ func main() {
 	r.HandleFunc("/test-post", testPostHandler)
 	r.HandleFunc("/tracking-parallel",trackingParallelHandler)
 	r.HandleFunc("/check-progression",checkProgressionHandler)
+	r.HandleFunc("/stop-tracking",stopTrackingHandler)
 
 	//Handled static files (like CSS and JS)
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))

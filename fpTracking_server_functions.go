@@ -11,8 +11,12 @@ import (
 )
 
 type progressInformationStruct struct {
+	//private
 	creationDate time.Time
 	inProgress bool
+	stopRequested bool
+
+	//public (will be in the JSON)
 	Progression int
 	CurrentVisitFrequency int
 	AverageTrackingTimeGraph []fpTracking.GraphicPoint
@@ -126,6 +130,18 @@ func launchTrackingAlgorithm(number int, minNbPerUser int, goroutineNumber int,
 
 
 	for _, visitFrequency := range visitFrequencies {
+
+		//We check if the user has asked for the algorithm to stop
+		//We need to have a clean read access to progressInformationSession
+		lock.RLock()
+		askedForStop := progressInformationSession[userId].stopRequested
+		lock.RUnlock()
+
+		if askedForStop {
+			log.Println("We stop the algorithm for user",userId)
+			break
+		}
+
 		scenarioResult := fpTracking.ReplayScenarioParallelWithProgressInformation(test,
 			visitFrequency, fpTracking.RuleBasedLinkingParallel, goroutineNumber,
 			visitFrequencyToReplaySequence[visitFrequency], progressChannel)

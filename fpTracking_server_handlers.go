@@ -175,6 +175,7 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 		progressInformationSession[userId] = &progressInformationStruct{
 			creationDate : time.Now(),
 			inProgress : true,
+			stopRequested : false,
 			Progression : 0,
 			CurrentVisitFrequency : visitFrequencies[0],
 			AverageTrackingTimeGraph : []fpTracking.GraphicPoint{},
@@ -196,4 +197,30 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 		", minNbPerUser =",minNbPerUser,", visitFrequencies =",visitFrequencies,", goroutineNumber =",goroutineNumber)
 	log.Println(launchMessage)
 	fmt.Fprintln(w, launchMessage)
+}
+
+func stopTrackingHandler(w http.ResponseWriter, r *http.Request) {
+
+	//We check if the user has a cookie with a userId
+	session, _ := store.Get(r, "fpTracking-cookie")
+	if session.IsNew {
+		http.Error(w, "Cookie not found", http.StatusForbidden)
+		return
+	}
+
+	userId := session.Values["userId"].(string)
+
+	//We lock the mutex in order to have a clean write access to progressInformationSession
+	lock.Lock()
+
+	if _, is_present := progressInformationSession[userId]; !is_present {
+		lock.Unlock()
+		return
+	}
+	progressInformationSession[userId].stopRequested = true
+
+	//We unlock the mutex
+	lock.Unlock()
+
+	log.Println("Stop tracking requested for user",userId)
 }

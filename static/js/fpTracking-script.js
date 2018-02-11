@@ -332,3 +332,34 @@ function resetGraphics() {
 
 	ownershipFrequencyGraph.series[0].data = [];
 }
+
+
+
+//WHEN THE USER LEAVES THE PAGE
+var hasUserLeftPage = false;
+
+$(window).on('beforeunload', () => {
+	//this will work only for Chrome
+	sendStopRequest();
+});
+
+$(window).on('unload', () => {
+	//this will work for other browsers
+	sendStopRequest();
+});
+
+function sendStopRequest() {
+	if (!hasUserLeftPage) {
+		$.ajax({
+			url: 'stop-tracking',
+			type: 'POST',
+			async: false,
+			success: (data) => {
+				hasUserLeftPage = true;
+			},
+			error: () => {
+				//alert("Error in checkProgression");
+			}
+		});
+	}
+}
