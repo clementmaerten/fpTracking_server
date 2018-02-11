@@ -49,19 +49,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func testPostHandler(w http.ResponseWriter, r *http.Request) {
-	
-	log.Println("testPostHandler launched")
-
-	r.ParseForm()
-	fmt.Println(r.Form)
-	//fmt.Println(r.FormValue("name"))
-	for key, value := range r.Form {
-		fmt.Println(key,value)
-		//fmt.Println(key,":",r.FormValue(key))
-	}
-}
-
 func checkProgressionHandler(w http.ResponseWriter, r *http.Request) {
 
 	//We check if the user has a cookie with a userId

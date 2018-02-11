@@ -35,7 +35,6 @@ func main() {
 	//Create the router and handle the URLs
 	r := mux.NewRouter()
 	r.HandleFunc("/",indexHandler)
-	r.HandleFunc("/test-post", testPostHandler)
 	r.HandleFunc("/tracking-parallel",trackingParallelHandler)
 	r.HandleFunc("/check-progression",checkProgressionHandler)
 	r.HandleFunc("/stop-tracking",stopTrackingHandler)
