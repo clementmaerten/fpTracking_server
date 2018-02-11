@@ -124,11 +124,11 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 	if err1 != nil || err2 != nil || err3 != nil || number <= 0 || minNbPerUser <= 0 || goroutineNumber <= 0 {
 		log.Println("Error in the format in trackingParallelHandler")
 		if err1 != nil {
-			http.Error(w, err1.Error(), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintln("Error parsing",r.FormValue("fpTrackingParallelNumber")), http.StatusBadRequest)
 		} else if err2 != nil {
-			http.Error(w, err2.Error(), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintln("Error parsing",r.FormValue("fpTrackingParallelMinNbPerUser")), http.StatusBadRequest)
 		} else if err3 != nil {
-			http.Error(w, err3.Error(), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintln("Error parsing",r.FormValue("fpTrackingParallelGoroutineNumber")), http.StatusBadRequest)
 		} else {
 			http.Error(w, "Nul or negative parameters", http.StatusBadRequest)
 		}
