@@ -239,7 +239,7 @@ func roundPlus(f float64, places int) (float64) {
 	return round(f * shift) / shift;
 }
 
-func generateFrontLaunchMessage(number int, minNbPerUser int, goroutineNumber int, visitFrequencies[]int) string {
+func generateFrontLaunchMessage(number int, minNbPerUser int, goroutineNumber int, visitFrequencies []int) string {
 	var buffer bytes.Buffer
 
 	buffer.WriteString(fmt.Sprintf("Rule-based algorithm succesfully launched with number : %d, minimum number per user : %d, goroutine number : %d and visit frequency : ",number,minNbPerUser,goroutineNumber))
