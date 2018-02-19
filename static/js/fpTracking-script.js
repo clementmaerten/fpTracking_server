@@ -32,7 +32,7 @@ $('#fpTrackingParallelForm').submit(() => {
 			url: 'tracking-parallel',
 			type: 'POST',
 			data: $('#fpTrackingParallelForm').serialize(),
-			success: (data) => {
+			success: (message) => {
 				//clear the error alerts
 				deleteErrorMessage('fpTrackingParallelResultsErrorAlertId');
 
@@ -41,6 +41,9 @@ $('#fpTrackingParallelForm').submit(() => {
 
 				//show the results div
 				$('#fpTrackingParallelResultsId').show();
+
+				//display the success alert
+				$('#fpTrackingParallelResultsSuccessAlertId').html(message);
 
 				//Begin the check of progression every 5 seconds
 				checkIntervalId = setInterval(checkProgression,5000);

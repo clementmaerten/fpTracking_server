@@ -180,10 +180,12 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type","text/plain; charset=utf-8")
 
-	launchMessage := fmt.Sprintln("trackingParallelHandler launched with number =",number,
+	logLaunchMessage := fmt.Sprintln("trackingParallelHandler launched with number =",number,
 		", minNbPerUser =",minNbPerUser,", visitFrequencies =",visitFrequencies,", goroutineNumber =",goroutineNumber)
-	log.Println(launchMessage)
-	fmt.Fprintln(w, launchMessage)
+	log.Println(logLaunchMessage)
+
+	frontLaunchMessage := generateFrontLaunchMessage(number,minNbPerUser,goroutineNumber,visitFrequencies)
+	fmt.Fprintln(w, frontLaunchMessage)
 }
 
 func stopTrackingHandler(w http.ResponseWriter, r *http.Request) {

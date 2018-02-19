@@ -4,6 +4,7 @@ import (
 	"log"
 	"fmt"
 	"math"
+	"bytes"
 	"time"
 	"strings"
 	"github.com/satori/go.uuid"
@@ -236,4 +237,19 @@ func round(f float64) float64 {
 func roundPlus(f float64, places int) (float64) {
 	shift := math.Pow(10, float64(places))
 	return round(f * shift) / shift;
+}
+
+func generateFrontLaunchMessage(number int, minNbPerUser int, goroutineNumber int, visitFrequencies[]int) string {
+	var buffer bytes.Buffer
+
+	buffer.WriteString(fmt.Sprintf("Rule-based algorithm succesfully launched with number : %d, minimum number per user : %d, goroutine number : %d and visit frequency : ",number,minNbPerUser,goroutineNumber))
+
+	length := len(visitFrequencies)
+
+	for i := 0; i < length - 1; i++ {
+		buffer.WriteString(fmt.Sprintf("%d, ",visitFrequencies[i]))
+	}
+	buffer.WriteString(fmt.Sprintf("%d.",visitFrequencies[length - 1]))
+
+	return buffer.String()
 }
