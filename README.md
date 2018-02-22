@@ -5,41 +5,40 @@ This repository contains a golang web server library which provides an interface
 ## Getting Started
 ### Prerequisites
 
-To use this library, you'll have to install some packages :
+To use this library, you'll have to install some libraries :
 
 ```
- $ go get github.com/gorilla/mux
- $ go get github.com/gorilla/sessions
- $ go get github.com/satori/go.uuid
+ $ github.com/gorilla/mux
+ $ github.com/gorilla/sessions
+ $ github.com/satori/go.uuid
 ```
+
+There is a Makefile in this package in order to install these libraries.
 
 You'll also need *github.com/clementmaerten/fpTracking* package. To install it, just follow the instructions written in the readme of the library.
 
 ### Installing
 
-For now, as the repository is private, **go get** function to get this package won't work. So here are the steps in order to install it :
+To download and use this package, follow the instructions below :
 
- * Go into the github.com/clementmaerten directory 
+ * Get the repository
 ```
- $ cd $(go env GOPATH)/src/github.com/clementmaerten
-```
-
- * Then clone the repository
-```
- $ git clone https://github.com/clementmaerten/fpTracking_server.git
- or
- $ git clone git@github.com:clementmaerten/fpTracking_server.git
+ $ go get github.com/clementmaerten/fpTracking_server
 ```
 
- * Go in the directory created
+ * Go inside this directory
 ```
- $ cd fpTracking_server
+ $ cd $(go env GOPATH)/src/github.com/clementmaerten/fpTracking_server
 ```
 
- * Then **build** the application inside this directory
+ * Then execute the Makefile (it will download the required libraries and build the package)
 ```
- $ go build
+ $ make
 ```
+
+### Configure database information
+
+Configure the conf/conf.json file with your database information.
 
 ### Running
 
