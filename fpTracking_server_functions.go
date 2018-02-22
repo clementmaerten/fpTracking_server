@@ -45,13 +45,10 @@ func listenFpTrackingProgressChannel(totalLength int, sortedVisitFrequencies []i
 			if rq.VisitFrequency != currentVisitFrequency {
 				indexAtNewVisitFrequency += lengths[currentVisitFrequency]
 				currentVisitFrequency = rq.VisitFrequency
-				log.Println("new visitFrequency :",currentVisitFrequency)
 				isVisitFrequencyChanged = true
 			}
 
 			globalProgression = (indexAtNewVisitFrequency + rq.Index) * 100 / totalLength
-
-			log.Println("progression :",globalProgression)
 
 			//We lock the mutex in order to have a clean write access to progressInformationSession
 			lock.Lock()
@@ -147,7 +144,7 @@ func launchTrackingAlgorithm(number int, minNbPerUser int, goroutineNumber int,
 			visitFrequency, fpTracking.RuleBasedLinkingParallel, goroutineNumber,
 			visitFrequencyToReplaySequence[visitFrequency], progressChannel)
 
-		log.Println("We compute the results for visitFrequency",visitFrequency)
+		log.Println("userId",userId,": Computing results for visitFrequency",visitFrequency)
 		progressChannel <- fpTracking.ProgressMessage {
 			Task : fpTracking.SEND_NEW_COMPUTED_POINTS,
 			GraphPoints : computeGraphicsPoints(fpTracking.AnalyseScenarioResultInStruct(visitFrequency, scenarioResult, test)),

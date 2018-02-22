@@ -22,7 +22,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	//The cookie contains a personal userId
 	session, _ := store.Get(r, "fpTracking-cookie")
 	if session.IsNew {
-		log.Println("We create a new cookie")
+		log.Println("Creating new cookie")
 		session.Options = &sessions.Options{
 			Path: "/",
 			MaxAge: 86400, //The cookie last 1 day at maximum
@@ -180,8 +180,8 @@ func trackingParallelHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type","text/plain; charset=utf-8")
 
-	logLaunchMessage := fmt.Sprintln("trackingParallelHandler launched with number =",number,
-		", minNbPerUser =",minNbPerUser,", visitFrequencies =",visitFrequencies,", goroutineNumber =",goroutineNumber)
+	logLaunchMessage := fmt.Sprint("userId ",userId," : TrackingParallelHandler launched with number = ",number,
+		", minNbPerUser = ",minNbPerUser,", visitFrequencies = ",visitFrequencies,", goroutineNumber = ",goroutineNumber)
 	log.Println(logLaunchMessage)
 
 	frontLaunchMessage := generateFrontLaunchMessage(number,minNbPerUser,goroutineNumber,visitFrequencies)
